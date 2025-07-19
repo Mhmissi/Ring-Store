@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Image, Settings, Sparkles, Gem, Zap, Check, X, Trash2, Eye, AlertCircle, ChevronDown, ChevronRight, Plus, Search, Filter, DollarSign, Edit3, Mail } from 'lucide-react';
+import { Upload, Image, Settings, Trash2, Eye, AlertCircle, ChevronDown, ChevronRight, DollarSign, Edit3, Gem } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const AdminPanel = () => {
@@ -67,13 +67,6 @@ const AdminPanel = () => {
     { value: 'princess', label: 'Princess Cut (Square)' },
     { value: 'emerald', label: 'Emerald Cut (Rectangular)' },
     { value: 'oval', label: 'Oval Brilliant Cut' }
-  ];
-
-  const carats = [
-    { value: '1.0', label: '1.0 Carat' },
-    { value: '1.5', label: '1.5 Carat' },
-    { value: '2.0', label: '2.0 Carat' },
-    { value: '2.5', label: '2.5 Carat' }
   ];
 
   // Fetch orders
@@ -192,28 +185,6 @@ const AdminPanel = () => {
       path += '/band.png';
     }
     return path;
-  };
-
-  const checkDuplicate = async () => {
-    const imagePath = generateImagePath();
-    if (!imagePath) return false;
-
-    try {
-      const { data, error } = await supabase
-        .from('ring_images')
-        .select('*')
-        .eq('image_url', imagePath)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      return !!data;
-    } catch (error) {
-      console.error('Error checking duplicate:', error);
-      return false;
-    }
   };
 
   const uploadImage = async () => {

@@ -2,45 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../App";
 import { ringOptions, basePrice } from "../data/ringOptions";
 
-const demoProducts = [
-  {
-    id: "solitaire-white-gold-round",
-    name: "Classic Solitaire in White Gold (Round)",
-    image: ringOptions.designs[0].image,
-    price: basePrice + ringOptions.metals[0].price + ringOptions.designs[0].price + ringOptions.shapes[0].price + ringOptions.carats[0].price,
-    metal: ringOptions.metals[0].name,
-    design: ringOptions.designs[0].name,
-    shape: ringOptions.shapes[0].name,
-  },
-  {
-    id: "halo-yellow-gold-princess",
-    name: "Halo Setting in Yellow Gold (Princess)",
-    image: ringOptions.designs[1].image,
-    price: basePrice + ringOptions.metals[1].price + ringOptions.designs[1].price + ringOptions.shapes[1].price + ringOptions.carats[0].price,
-    metal: ringOptions.metals[1].name,
-    design: ringOptions.designs[1].name,
-    shape: ringOptions.shapes[1].name,
-  },
-  {
-    id: "vintage-platinum-emerald",
-    name: "Vintage Platinum (Emerald Cut)",
-    image: ringOptions.designs[2].image,
-    price: basePrice + ringOptions.metals[3].price + ringOptions.designs[2].price + ringOptions.shapes[2].price + ringOptions.carats[0].price,
-    metal: ringOptions.metals[3].name,
-    design: ringOptions.designs[2].name,
-    shape: ringOptions.shapes[2].name,
-  },
-  {
-    id: "three-stone-rose-gold-oval",
-    name: "Three Stone in Rose Gold (Oval)",
-    image: ringOptions.designs[3].image,
-    price: basePrice + ringOptions.metals[2].price + ringOptions.designs[3].price + ringOptions.shapes[3].price + ringOptions.carats[0].price,
-    metal: ringOptions.metals[2].name,
-    design: ringOptions.designs[3].name,
-    shape: ringOptions.shapes[3].name,
-  },
-];
-
 const Wishlist = () => {
   const { addToCart } = useCart();
   const [wishlist, setWishlist] = useState([]);

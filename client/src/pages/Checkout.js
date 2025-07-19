@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useCart } from "../App";
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, MapPin, User, Mail, Phone, Lock, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { CreditCard, MapPin, Shield, CheckCircle } from 'lucide-react';
 
 const Checkout = () => {
   const { cart, setCart } = useCart();
@@ -11,7 +11,6 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState(null);
   const [errors, setErrors] = useState({});
   
   const [form, setForm] = useState({
@@ -175,7 +174,7 @@ const Checkout = () => {
     setCart([]);
       
       // Set order complete
-      setOrderId(order.id);
+      // setOrderId(order.id); // This line was removed as per the edit hint
       setOrderComplete(true);
       
     } catch (error) {

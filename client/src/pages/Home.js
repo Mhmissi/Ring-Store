@@ -2,13 +2,6 @@ import React from "react";
 // Framer Motion import for future animation
 // import { motion } from "framer-motion";
 
-const heroBg = "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80"; // Example luxury jewelry bg
-
-const featuredImages = [
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80", // Wedding Rings
-  "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80", // Engagement Rings
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80", // Custom Designs
-];
 const bestsellersImages = [
   process.env.PUBLIC_URL + '/ringstestimages/three stone gold round.jpg',
   process.env.PUBLIC_URL + '/ringstestimages/three stone platinum round.jpg',
@@ -20,7 +13,7 @@ const Home = () => (
   <div className="bg-diamondWhite min-h-screen font-sans">
     {/* Hero Section */}
     <section className="w-full flex flex-col items-center justify-center text-center py-24 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #F8F9FA 60%, #E5E4E2 100%)', minHeight: '60vh' }}>
-      <div className="absolute inset-0 opacity-60" style={{ background: 'url("/ringstestimages/diamond seting ring platinum  diamond rectangular.jpeg") center/cover no-repeat' }}></div>
+      <div className="absolute inset-0 opacity-60" style={{ background: 'url("/ringstestimages/my-hero-bg.jpg") center/cover no-repeat' }}></div>
       <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-platinumSilver/60 to-brilliantBlue/20" style={{ pointerEvents: 'none' }}></div>
       <div className="relative z-10 animate-fadein">
         <h1 className="text-5xl md:text-7xl font-serif font-extrabold mb-4 text-brilliantBlue drop-shadow-lg" style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '-1px' }}>

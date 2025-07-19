@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  ChevronRight, 
   ChevronLeft, 
   Check, 
   Heart, 
@@ -16,7 +15,6 @@ import { ringOptions, basePrice } from '../data/ringOptions';
 import ProgressBar from './ProgressBar';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../App';
-import { useNavigate } from 'react-router-dom';
 import CustomizationStep from './CustomizationStep';
 
 // Elegant ring SVG for fallback
@@ -35,14 +33,12 @@ const RingIcon = (props) => (
 
 const RingCustomizer = () => {
   const { addToCart } = useCart();
-  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selections, setSelections] = useState({ metal: '', design: '', shape: '', carat: '' });
   const [currentImage, setCurrentImage] = useState('');
   const [totalPrice, setTotalPrice] = useState(basePrice);
   const [showFloatingMessage, setShowFloatingMessage] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [added, setAdded] = useState(false);
 
   // Step definitions
@@ -338,7 +334,7 @@ const RingCustomizer = () => {
             </div>
           )}
           {/* Success Message */}
-          {showSuccessMessage && (
+          {added && (
             <div className="absolute top-0 left-0 right-0 flex justify-center pointer-events-none z-10">
               <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-bounce mt-4">
                 <div className="flex items-center">
