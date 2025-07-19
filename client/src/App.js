@@ -15,6 +15,7 @@ import ChangePassword from './components/ChangePassword';
 import AuthPage from './pages/AuthPage';
 import Contact from './pages/Contact';
 import About from './pages/About';
+import { supabase } from './lib/supabase';
 
 // Remove unused imports
 // import { Link } from 'react-router-dom';
@@ -169,7 +170,6 @@ const CartProvider = ({ children }) => {
 
   // Listen for auth changes
   useEffect(() => {
-    const { supabase } = require('./lib/supabase');
     
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -193,7 +193,6 @@ const CartProvider = ({ children }) => {
 
     const loadCart = async () => {
       try {
-        const { supabase } = require('./lib/supabase');
         const { data, error } = await supabase
           .from('cart_items')
           .select('*')
@@ -221,7 +220,6 @@ const CartProvider = ({ children }) => {
     }
 
     try {
-      const { supabase } = require('./lib/supabase');
       const isCustom = product.id && product.id.startsWith('custom-');
       // Check if item already exists in cart (custom: match by id, regular: match by product_id)
       let existingItem;
@@ -298,7 +296,6 @@ const CartProvider = ({ children }) => {
     if (!user) return;
 
     try {
-      const { supabase } = require('./lib/supabase');
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -323,7 +320,6 @@ const CartProvider = ({ children }) => {
     }
 
     try {
-      const { supabase } = require('./lib/supabase');
       const { error } = await supabase
         .from('cart_items')
         .update({ qty })
@@ -345,7 +341,6 @@ const CartProvider = ({ children }) => {
     if (!user) return;
 
     try {
-      const { supabase } = require('./lib/supabase');
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -416,16 +411,14 @@ function AdminRoute() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    import('./lib/supabase').then(({ supabase }) => {
-      supabase.auth.getSession().then(({ data }) => {
-        setUser(data.session?.user || null);
-        setLoading(false);
-      });
-      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user || null);
-      });
-      return () => listener.subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user || null);
+      setLoading(false);
     });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+    return () => listener.subscription.unsubscribe();
   }, []);
 
   if (loading) return <div>Loading...</div>;
