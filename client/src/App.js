@@ -278,7 +278,7 @@ const CartProvider = ({ children }) => {
         if (!isCustom) {
           insertObj.product_id = product.id;
         }
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('cart_items')
           .insert(insertObj)
           .select()

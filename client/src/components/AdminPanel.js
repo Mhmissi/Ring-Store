@@ -6,6 +6,7 @@ const AdminPanel = () => {
   const [selectedMetal, setSelectedMetal] = useState('');
   const [selectedDesign, setSelectedDesign] = useState('');
   const [selectedShape, setSelectedShape] = useState('');
+  const [selectedCarat, setSelectedCarat] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -230,7 +231,6 @@ const AdminPanel = () => {
       setSelectedMetal('');
       setSelectedDesign('');
       setSelectedShape('');
-      setSelectedCarat('');
       // Reset file input
       const fileInput = document.getElementById('file-input');
       if (fileInput) fileInput.value = '';
@@ -999,7 +999,6 @@ const AdminPanel = () => {
                           setSelectedDesign(combo.design);
                           setSelectedMetal(combo.metal);
                           setSelectedShape(combo.shape);
-                          setSelectedCarat(''); // No carat pre-selected
                           const uploadSection = document.getElementById('upload-section');
                           if (uploadSection) {
                             uploadSection.scrollIntoView({ behavior: 'smooth' });
