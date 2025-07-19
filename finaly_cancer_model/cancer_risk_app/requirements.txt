@@ -1,0 +1,10 @@
+torch
+pandas
+numpy
+scikit-learn
+fastapi
+uvicorn
+pydantic
+optuna
+shap
+pytorch-lightning
