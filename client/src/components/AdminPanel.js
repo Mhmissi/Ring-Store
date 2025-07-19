@@ -6,7 +6,6 @@ const AdminPanel = () => {
   const [selectedMetal, setSelectedMetal] = useState('');
   const [selectedDesign, setSelectedDesign] = useState('');
   const [selectedShape, setSelectedShape] = useState('');
-  const [selectedCarat, setSelectedCarat] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [uploading, setUploading] = useState(false);

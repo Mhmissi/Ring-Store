@@ -123,7 +123,7 @@ const Checkout = () => {
     
     try {
       // Create order in database
-      const { data: order, error: orderError } = await supabase
+      const { error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
@@ -131,7 +131,7 @@ const Checkout = () => {
             product: `${item.designLabel || item.design_label || item.name || 'Custom Ring'} - ${item.metalLabel || item.metal_label || item.metal || 'N/A'} - ${item.carat || 'N/A'}ct`,
             qty: item.qty,
             price: item.price,
-            product_id: item.product_id || ((!item.id || (item.id && item.id.startsWith('custom-'))) ? null : item.id)
+            product_id: item.product_id || (((!item.id) || (item.id && item.id.startsWith('custom-'))) ? null : item.id)
           })),
           subtotal: subtotal,
           shipping: shipping,
