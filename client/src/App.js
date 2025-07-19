@@ -166,7 +166,6 @@ export const useCart = () => useContext(CartContext);
 const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Listen for auth changes
   useEffect(() => {
@@ -175,7 +174,6 @@ const CartProvider = ({ children }) => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      setLoading(false);
     });
 
     // Listen for auth changes
@@ -250,7 +248,7 @@ const CartProvider = ({ children }) => {
 
       if (existingItem) {
         // Update quantity
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('cart_items')
           .update({ qty: existingItem.qty + 1 })
           .eq('id', existingItem.id)
@@ -280,7 +278,7 @@ const CartProvider = ({ children }) => {
         if (!isCustom) {
           insertObj.product_id = product.id;
         }
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('cart_items')
           .insert(insertObj)
           .select()
