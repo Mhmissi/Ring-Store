@@ -108,7 +108,7 @@ const Checkout = () => {
     }
     
     // Phone validation
-    if (form.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(form.phone.replace(/\s/g, ''))) {
+    if (form.phone && !/^\+?[1-9][\d]{0,15}$/.test(form.phone.replace(/\s/g, ''))) {
       newErrors.phone = 'Please enter a valid phone number';
     }
     

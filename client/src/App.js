@@ -144,12 +144,12 @@ const Header = () => {
       </nav>
       <style>{`
         .text-brilliantBlue { color: #4F8EF7; }
-        .hover\:text-brilliantBlue:hover { color: #4F8EF7; }
+        .hover:text-brilliantBlue:hover { color: #4F8EF7; }
         .bg-brilliantBlue { background-color: #4F8EF7; }
         .bg-diamondWhite { background-color: #F8F9FA; }
         .bg-platinumSilver { background-color: #E5E4E2; }
         .text-charcoalGray { color: #333333; }
-        .hover\:text-champagneGold:hover { color: #FFD700; }
+        .hover:text-champagneGold:hover { color: #FFD700; }
         .bg-champagneGold { background-color: #FFD700; }
         .border-brilliantBlue { border-color: #4F8EF7; }
         .border-champagneGold { border-color: #FFD700; }

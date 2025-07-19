@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../App";
-import { ringOptions, basePrice } from "../data/ringOptions";
 
 const Wishlist = () => {
   const { addToCart } = useCart();

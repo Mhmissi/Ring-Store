@@ -170,23 +170,6 @@ const AdminPanel = () => {
     }
   };
 
-  const generateImagePath = () => {
-    if (!selectedDesign) return '';
-    let path = `rings/${selectedDesign}`;
-    if (selectedMetal) {
-      path += `/${selectedMetal}`;
-    }
-    if (selectedShape) {
-      path += `/${selectedShape}`;
-    }
-    if (selectedCarat) {
-      path += `/${selectedCarat}ct.png`;
-    } else {
-      path += '/band.png';
-    }
-    return path;
-  };
-
   const uploadImage = async () => {
     // Validate required fields
     if (!selectedFile) {
@@ -213,7 +196,7 @@ const AdminPanel = () => {
     setMessage('');
     try {
       // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('ring-images')
         .upload(path, selectedFile, {
           cacheControl: '3600',

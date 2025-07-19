@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const getRingImageUrl = async (metal, design, shape, carat) => {
   try {
     // First try to get from database
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('ring_images')
       .select('image_url')
       .eq('metal', metal)
