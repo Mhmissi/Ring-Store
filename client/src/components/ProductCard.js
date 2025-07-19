@@ -102,13 +102,13 @@ const ProductCard = ({ ring, onAddToCart }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl bg-diamondWhite rounded-lg shadow-elegant p-8 flex flex-col md:flex-row gap-8 items-start border border-brilliantBlue/20">
+    <div className="w-full max-w-4xl bg-pureWhite rounded-lg shadow-elegant p-8 flex flex-col md:flex-row gap-8 items-start border border-navyBlue/20">
       {/* Left: Image and Metal Selector */}
       <div className="flex flex-col items-center md:items-start w-full md:w-1/2">
         <div className="w-full flex flex-col items-center relative">
           {/* Heart Icon Button */}
           <button
-            className={`absolute top-4 right-4 z-10 rounded-full p-2 bg-diamondWhite/80 border border-champagneGold shadow-elegant transition hover:bg-champagneGold hover:text-black ${inWishlist ? 'text-red-500' : 'text-brilliantBlue'}`}
+            className={`absolute top-4 right-4 z-10 rounded-full p-2 bg-pureWhite/80 border border-warmGold shadow-elegant transition hover:bg-warmGold hover:text-navyBlue ${inWishlist ? 'text-red-500' : 'text-navyBlue'}`}
             onClick={toggleWishlist}
             aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             style={{ outline: 'none' }}
@@ -127,7 +127,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
           </button>
           <div
             ref={imageRef}
-            className="w-80 h-80 mb-4 rounded shadow-elegant overflow-hidden bg-platinumSilver relative cursor-zoom-in border border-brilliantBlue/10"
+            className="w-80 h-80 mb-4 rounded shadow-elegant overflow-hidden bg-softGray relative cursor-zoom-in border border-navyBlue/10"
             style={{ position: 'relative' }}
             onMouseMove={handleMouseMove}
             onClick={handleImageClick}
@@ -150,14 +150,14 @@ const ProductCard = ({ ring, onAddToCart }) => {
             />
             {/* Zoom indicator */}
             {!zoom && (
-              <div className="absolute top-2 right-2 bg-brilliantBlue/80 text-white text-xs px-2 py-1 rounded shadow-elegant">
+              <div className="absolute top-2 right-2 bg-navyBlue/80 text-white text-xs px-2 py-1 rounded shadow-elegant">
                 Click to zoom
               </div>
             )}
             {/* Zoomed image overlay */}
             {zoom && (
               <div
-                className="fixed z-50 border-2 border-champagneGold rounded-lg shadow-2xl bg-diamondWhite"
+                className="fixed z-50 border-2 border-warmGold rounded-lg shadow-2xl bg-pureWhite"
                 style={{
                   top: '50%',
                   left: '50%',
@@ -185,7 +185,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
             {/* Backdrop for zoom */}
             {zoom && (
               <div
-                className="fixed inset-0 bg-brilliantBlue/20 z-40"
+                className="fixed inset-0 bg-navyBlue/20 z-40"
                 onClick={() => setZoom(false)}
                 style={{ cursor: 'pointer' }}
               />
@@ -194,12 +194,12 @@ const ProductCard = ({ ring, onAddToCart }) => {
         </div>
         {/* Metal Selector as colored circles */}
         <div className="flex flex-col items-center mt-4">
-          <span className="text-sm font-semibold mb-2 text-brilliantBlue">Choose Metal</span>
+          <span className="text-sm font-semibold mb-2 text-navyBlue">Choose Metal</span>
           <div className="flex flex-row gap-4">
             {ring.availableMetals.map(metal => (
               <button
                 key={metal}
-                className={`w-8 h-8 rounded-full border-2 ${selectedMetal === metal ? 'border-champagneGold ring-2 ring-brilliantBlue' : 'border-platinumSilver'} flex items-center justify-center transition`}
+                className={`w-8 h-8 rounded-full border-2 ${selectedMetal === metal ? 'border-warmGold ring-2 ring-navyBlue' : 'border-softGray'} flex items-center justify-center transition`}
                 style={{ backgroundColor: metalColors[metal] || '#eee' }}
                 onClick={() => setSelectedMetal(metal)}
                 aria-label={metalLabels[metal]}
@@ -211,29 +211,29 @@ const ProductCard = ({ ring, onAddToCart }) => {
       {/* Right: Details */}
       <div className="flex-1 flex flex-col items-start">
         {/* Breadcrumb */}
-        <div className="text-xs text-brilliantBlue mb-2">
+        <div className="text-xs text-navyBlue mb-2">
           Home / ENGAGEMENT RINGS / <span className="text-charcoalGray font-semibold">{ring.designLabel}</span>
         </div>
         {/* Title */}
-        <h1 className="text-2xl md:text-3xl font-bold text-brilliantBlue mb-2 leading-tight">{ring.designLabel} Diamond Ring</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-navyBlue mb-2 leading-tight">{ring.designLabel} Diamond Ring</h1>
         {/* SKU and Tag */}
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-xs text-platinumSilver">SKU: SH-XXXX</span>
-          <span className="bg-softBlush text-brilliantBlue text-xs font-semibold px-2 py-1 rounded">Natural</span>
+          <span className="text-xs text-softGray">SKU: SH-XXXX</span>
+          <span className="bg-softBlush text-navyBlue text-xs font-semibold px-2 py-1 rounded">Natural</span>
         </div>
         {/* Price */}
-        <div className="text-3xl font-bold text-champagneGold mb-4">${currentPrice.toLocaleString()}</div>
+        <div className="text-3xl font-bold text-warmGold mb-4">${currentPrice.toLocaleString()}</div>
         {/* Description */}
         <p className="text-charcoalGray mb-4 max-w-lg">{ring.description}</p>
         {/* Metal label */}
-        <div className="mb-2 text-brilliantBlue"><span className="font-semibold">Metal:</span> {metalLabels[selectedMetal]}</div>
+        <div className="mb-2 text-navyBlue"><span className="font-semibold">Metal:</span> {metalLabels[selectedMetal]}</div>
         {/* Carat Selector */}
         <div className="mb-4">
-          <span className="font-semibold text-brilliantBlue mr-2">Carat weight:</span>
+          <span className="font-semibold text-navyBlue mr-2">Carat weight:</span>
           {caratOptions.map(opt => (
             <button
               key={opt.value}
-              className={`inline-block px-4 py-2 rounded-full border text-sm font-semibold mr-2 mb-2 ${selectedCarat === opt.value ? 'bg-brilliantBlue text-white border-brilliantBlue' : 'bg-diamondWhite text-brilliantBlue border-platinumSilver hover:bg-brilliantBlue/10'}`}
+              className={`inline-block px-4 py-2 rounded-full border text-sm font-semibold mr-2 mb-2 ${selectedCarat === opt.value ? 'bg-navyBlue text-white border-navyBlue' : 'bg-pureWhite text-navyBlue border-softGray hover:bg-navyBlue/10'}`}
               onClick={() => setSelectedCarat(opt.value)}
             >
               {opt.label}
@@ -242,7 +242,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
         </div>
         {/* Add to Cart */}
         <button
-          className="mt-4 px-8 py-3 bg-champagneGold text-black font-bold rounded-full shadow-elegant hover:bg-brilliantBlue hover:text-white transition text-lg tracking-wide border border-champagneGold focus:outline-none focus:ring-2 focus:ring-brilliantBlue/40 hover:scale-105"
+          className="mt-4 px-8 py-3 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition text-lg tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
           onClick={() => onAddToCart({ ...ring, metal: selectedMetal, carat: selectedCarat, price: currentPrice })}
         >
           Add to Cart

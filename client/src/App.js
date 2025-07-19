@@ -107,7 +107,7 @@ const Header = () => {
   return (
     <header className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/5 shadow-elegant sticky top-0 z-50 backdrop-blur-md border-b-2 border-navyBlue/10">
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <a href="/" className="text-2xl font-extrabold text-navyBlue tracking-wide font-serif" style={{ fontFamily: 'Playfair Display, serif' }}>Shemesh Gold</a>
+        <a href="/" className="text-2xl font-extrabold text-navyBlue tracking-wide font-serif" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</a>
         <button className="md:hidden text-navyBlue focus:outline-none" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
         </button>
@@ -399,8 +399,8 @@ const Footer = () => (
   <footer className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/10 text-navyBlue pt-12 pb-6 px-4 mt-16 border-t border-navyBlue/20">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
       <div>
-        <h3 className="font-serif text-2xl font-bold mb-3 text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>Shemesh Gold</h3>
-        <p className="text-darkGray mb-4">Exquisite rings for life's most precious moments.</p>
+        <h3 className="font-serif text-2xl font-bold mb-3 text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</h3>
+        <p className="text-darkGray mb-4">Exquisite lab-grown diamond rings for life's most precious moments.</p>
         <div className="flex gap-4 mt-2">
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2.1c-3.9 0-7 3.1-7 7v2H7v3h3v7h3v-7h2.1l.4-3H13V9c0-1.1.9-2 2-2h2V4.1c0-1.1-.9-2-2-2z"/></svg></a>
@@ -432,7 +432,7 @@ const Footer = () => (
         </form>
       </div>
     </div>
-    <div className="text-center text-darkGray text-xs mt-10">&copy; {new Date().getFullYear()} Shemesh Gold. All rights reserved.</div>
+    <div className="text-center text-darkGray text-xs mt-10">&copy; {new Date().getFullYear()} Grown Lab Diamond. All rights reserved.</div>
   </footer>
 );
 

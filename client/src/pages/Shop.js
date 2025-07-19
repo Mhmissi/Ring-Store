@@ -136,52 +136,52 @@ const Shop = () => {
   if (error) return <div className="text-center py-12 text-red-600">Error: {error}</div>;
 
   return (
-  <div className="bg-diamondWhite min-h-screen font-sans px-4 py-12">
-    <h1 className="text-4xl font-serif font-bold text-brilliantBlue mb-10 text-center tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+  <div className="bg-pureWhite min-h-screen font-sans px-4 py-12">
+    <h1 className="text-4xl font-serif font-bold text-navyBlue mb-10 text-center tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
       Shop All Rings
     </h1>
       {/* Filter Bar */}
       <div className="flex flex-wrap gap-4 justify-center mb-8">
-        <select className="border border-brilliantBlue/30 rounded px-5 py-2 text-charcoalGray bg-platinumSilver focus:outline-brilliantBlue" value={filters.design} onChange={e => handleFilterChange('design', e.target.value)}>
+        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.design} onChange={e => handleFilterChange('design', e.target.value)}>
           {designOptions.map(opt => <option key={opt} value={opt}>{designLabels[opt]}</option>)}
         </select>
-        <select className="border border-brilliantBlue/30 rounded px-5 py-2 text-charcoalGray bg-platinumSilver focus:outline-brilliantBlue" value={filters.metal} onChange={e => handleFilterChange('metal', e.target.value)}>
+        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.metal} onChange={e => handleFilterChange('metal', e.target.value)}>
           {metalOptions.map(opt => <option key={opt} value={opt}>{metalLabels[opt]}</option>)}
       </select>
-        <select className="border border-brilliantBlue/30 rounded px-5 py-2 text-charcoalGray bg-platinumSilver focus:outline-brilliantBlue" value={filters.shape} onChange={e => handleFilterChange('shape', e.target.value)}>
+        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.shape} onChange={e => handleFilterChange('shape', e.target.value)}>
           {shapeOptions.map(opt => <option key={opt} value={opt}>{shapeLabels[opt]}</option>)}
       </select>
-        <select className="border border-brilliantBlue/30 rounded px-5 py-2 text-charcoalGray bg-platinumSilver focus:outline-brilliantBlue" value={filters.carat} onChange={e => handleFilterChange('carat', e.target.value)}>
+        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.carat} onChange={e => handleFilterChange('carat', e.target.value)}>
           {caratOptions.map(opt => <option key={opt} value={opt}>{caratLabels[opt]}</option>)}
       </select>
-        <button className="px-5 py-2 bg-brilliantBlue text-white font-bold rounded border border-brilliantBlue hover:bg-champagneGold hover:text-black transition" onClick={clearFilters}>
+        <button className="px-5 py-2 bg-navyBlue text-white font-bold rounded border border-navyBlue hover:bg-warmGold hover:text-navyBlue transition" onClick={clearFilters}>
           Clear Filters
         </button>
     </div>
-      <div className="w-full border-t border-platinumSilver my-8" />
+      <div className="w-full border-t border-lightGray my-8" />
     {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
         {filteredProducts.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-12">No products found for selected filters.</div>
+          <div className="col-span-full text-center text-mediumGray py-12">No products found for selected filters.</div>
         ) : filteredProducts.map((product) => {
           const imageUrl = product.public_url || (product.image_url
             ? supabase.storage.from('ring-images').getPublicUrl(product.image_url).data.publicUrl
             : '/placeholder-ring.png');
           const price = getPriceForDesignAndCarat(product.design, product.carat);
           return (
-        <div key={product.id} className="bg-platinumSilver rounded-2xl shadow-elegant border border-brilliantBlue/20 hover:border-brilliantBlue transition-all duration-300 flex flex-col items-center group overflow-hidden relative">
-          <div className="w-full h-56 flex items-center justify-center overflow-hidden rounded-t-2xl bg-diamondWhite">
+        <div key={product.id} className="bg-softGray rounded-2xl shadow-elegant border border-navyBlue/20 hover:border-navyBlue transition-all duration-300 flex flex-col items-center group overflow-hidden relative">
+          <div className="w-full h-56 flex items-center justify-center overflow-hidden rounded-t-2xl bg-pureWhite">
                 <img src={imageUrl} alt={product.design} className="w-full h-full object-cover transform group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300 ease-in-out" onError={e => { e.target.src = '/placeholder-ring.png'; }} />
           </div>
           <div className="p-5 w-full flex flex-col items-center">
-                <div className="font-serif text-lg font-bold mb-1 text-center text-brilliantBlue" style={{ fontFamily: 'Playfair Display, serif' }}>{designLabels[product.design] || product.design}</div>
-                <div className="text-charcoalGray text-sm mb-1">{metalLabels[product.metal] || product.metal} • {shapeLabels[product.diamond_shape] || product.diamond_shape} • {product.carat ? `${product.carat} ct` : ''}</div>
-                <div className="text-champagneGold text-base mb-3 font-semibold">{price ? `$${price.toLocaleString()}` : 'Price on request'}</div>
-            <a href={`/product/${product.id}`} className="inline-block mt-auto px-6 py-2 bg-brilliantBlue text-white font-bold rounded-full shadow-elegant hover:bg-champagneGold hover:text-black transition-all duration-200 text-sm tracking-wide border border-brilliantBlue focus:outline-none focus:ring-2 focus:ring-brilliantBlue/40 hover:scale-105">
+                <div className="font-serif text-lg font-bold mb-1 text-center text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>{designLabels[product.design] || product.design}</div>
+                <div className="text-darkGray text-sm mb-1">{metalLabels[product.metal] || product.metal} • {shapeLabels[product.diamond_shape] || product.diamond_shape} • {product.carat ? `${product.carat} ct` : ''}</div>
+                <div className="text-warmGold text-base mb-3 font-semibold">{price ? `$${price.toLocaleString()}` : 'Price on request'}</div>
+            <a href={`/product/${product.id}`} className="inline-block mt-auto px-6 py-2 bg-navyBlue text-white font-bold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 text-sm tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105">
               View Details
             </a>
             <button
-              className="mt-2 px-6 py-2 bg-champagneGold text-black font-bold rounded-full shadow-elegant hover:bg-brilliantBlue hover:text-white transition-all duration-200 text-sm tracking-wide border border-champagneGold focus:outline-none focus:ring-2 focus:ring-brilliantBlue/40 hover:scale-105"
+              className="mt-2 px-6 py-2 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-sm tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
               onClick={() => {
                 addToCart({
                   id: product.id,
@@ -217,15 +217,15 @@ const Shop = () => {
         })}
     </div>
     <style>{`
-      .text-brilliantBlue { color: #4a90e2; }
-      .border-brilliantBlue { border-color: #4a90e2; }
-      .bg-brilliantBlue { background-color: #4a90e2; }
-      .text-champagneGold { color: #f0d787; }
-      .border-champagneGold { border-color: #f0d787; }
-      .bg-champagneGold { background-color: #f0d787; }
-      .text-charcoalGray { color: #333333; }
-      .bg-diamondWhite { background-color: #f9f9f9; }
-      .border-platinumSilver { border-color: #e0e0e0; }
+      .text-navyBlue { color: #2c3e50; }
+      .border-navyBlue { border-color: #2c3e50; }
+      .bg-navyBlue { background-color: #2c3e50; }
+      .text-warmGold { color: #f39c12; }
+      .border-warmGold { border-color: #f39c12; }
+      .bg-warmGold { background-color: #f39c12; }
+      .text-darkGray { color: #555555; }
+      .bg-pureWhite { background-color: #ffffff; }
+      .border-lightGray { border-color: #e0e0e0; }
       .shadow-elegant { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
     `}</style>
   </div>
