@@ -3,8 +3,10 @@ import { useCart } from "../App";
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, MapPin, Shield, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Checkout = () => {
+  const { t } = useLanguage();
   const { cart, setCart } = useCart();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -205,7 +207,7 @@ const Checkout = () => {
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading checkout...</p>
+          <p className="text-gray-600">{t('loadingCheckout')}</p>
         </div>
       </div>
     );
@@ -245,7 +247,7 @@ const Checkout = () => {
     <div className="bg-diamondWhite min-h-screen py-10 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-serif font-bold mb-8 text-center text-brilliantBlue" style={{ fontFamily: 'Playfair Display, serif' }}>
-          Checkout
+          {t('checkout')}
         </h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
@@ -542,7 +544,7 @@ const Checkout = () => {
               <div className="flex items-start space-x-3">
                 <Shield className="w-5 h-5 text-brilliantBlue mt-0.5 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-brilliantBlue mb-1">Secure Checkout</h3>
+                  <h3 className="font-semibold text-brilliantBlue mb-1">{t('secureCheckout')}</h3>
                   <p className="text-sm text-brilliantBlue">
                     Your payment information is encrypted and secure. We use industry-standard SSL encryption to protect your data.
                   </p>

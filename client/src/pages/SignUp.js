@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function SignUp({ onSignUp }) {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,11 +22,11 @@ export default function SignUp({ onSignUp }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <form onSubmit={handleSignUp} className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('signUp')}</h2>
         {error && <div className="mb-4 text-red-600">{error}</div>}
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t('emailAddress')}
           className="w-full mb-3 px-3 py-2 border rounded"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -32,7 +34,7 @@ export default function SignUp({ onSignUp }) {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t('password')}
           className="w-full mb-6 px-3 py-2 border rounded"
           value={password}
           onChange={e => setPassword(e.target.value)}
@@ -43,7 +45,7 @@ export default function SignUp({ onSignUp }) {
           className="w-full bg-black text-gold font-bold py-2 rounded hover:bg-gold hover:text-black transition"
           disabled={loading}
         >
-          {loading ? 'Signing up...' : 'Sign Up'}
+          {loading ? t('signingUp') : t('signUp')}
         </button>
       </form>
     </div>

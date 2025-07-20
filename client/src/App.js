@@ -13,6 +13,8 @@ import './index.css';
 import AdminLogin from './pages/AdminLogin';
 import ChangePassword from './components/ChangePassword';
 import AuthPage from './pages/AuthPage';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 import { supabase } from './lib/supabase';
 
@@ -102,6 +104,7 @@ const CartCount = () => {
 };
 
 const Header = () => {
+  const { t } = useLanguage();
   const [open, setOpen] = React.useState(false);
   return (
     <header className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/5 shadow-elegant sticky top-0 z-50 backdrop-blur-md border-b-2 border-navyBlue/10">
@@ -127,14 +130,14 @@ const Header = () => {
         </button>
         <ul className={`flex-col md:flex-row md:flex gap-0 md:gap-8 items-center font-semibold text-darkGray text-lg font-sans transition-all duration-300 ${open ? 'flex absolute top-20 left-0 w-full bg-pureWhite py-6 z-40 border-t-2 border-navyBlue/10 shadow-lg' : 'hidden md:flex'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
           {/* Main Navigation */}
-          <li className="w-full md:w-auto"><a href="/" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Home</a></li>
-          <li className="w-full md:w-auto"><a href="/shop" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Shop</a></li>
-          <li className="w-full md:w-auto"><a href="/customize" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Customize</a></li>
-          <li className="w-full md:w-auto"><a href="/wishlist" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Wishlist</a></li>
+          <li className="w-full md:w-auto"><a href="/" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">{t('home')}</a></li>
+          <li className="w-full md:w-auto"><a href="/shop" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">{t('shop')}</a></li>
+          <li className="w-full md:w-auto"><a href="/customize" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">{t('customize')}</a></li>
+          <li className="w-full md:w-auto"><a href="/wishlist" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">{t('wishlist')}</a></li>
           {/* Divider */}
           <div className="hidden md:block w-px h-6 bg-navyBlue/20"></div>
           {/* User Actions */}
-          <li className="w-full md:w-auto"><a href="/auth" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Login / Sign Up</a></li>
+          <li className="w-full md:w-auto"><a href="/auth" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">{t('login')}</a></li>
           <li className="w-full md:w-auto">
             <a href="/account" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mx-auto md:mx-0">
@@ -149,6 +152,10 @@ const Header = () => {
               </svg>
               <CartCount />
             </a>
+          </li>
+          {/* Language Switcher */}
+          <li className="w-full md:w-auto flex justify-center md:justify-start">
+            <LanguageSwitcher />
           </li>
         </ul>
       </nav>
@@ -404,12 +411,14 @@ const CartProvider = ({ children }) => {
 };
 
 // Luxury Footer
-const Footer = () => (
+const Footer = () => {
+  const { t } = useLanguage();
+  return (
   <footer className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/10 text-navyBlue pt-12 pb-6 px-4 mt-16 border-t border-navyBlue/20">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
       <div>
         <h3 className="font-serif text-2xl font-bold mb-3 text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</h3>
-        <p className="text-darkGray mb-4">Exquisite lab-grown diamond rings for life's most precious moments.</p>
+        <p className="text-darkGray mb-4">{t('exquisiteLabGrown')}</p>
         <div className="flex gap-4 mt-2">
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2.1c-3.9 0-7 3.1-7 7v2H7v3h3v7h3v-7h2.1l.4-3H13V9c0-1.1.9-2 2-2h2V4.1c0-1.1-.9-2-2-2z"/></svg></a>
@@ -417,32 +426,33 @@ const Footer = () => (
         </div>
       </div>
       <div>
-        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">Links</h4>
+        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">{t('links')}</h4>
         <ul className="space-y-2">
-          <li><a href="/shop" className="hover:text-warmGold transition">Shop</a></li>
-          <li><a href="/customize" className="hover:text-warmGold transition">Customize</a></li>
-          <li><a href="/wishlist" className="hover:text-warmGold transition">Wishlist</a></li>
-          <li><a href="/account" className="hover:text-warmGold transition">Account</a></li>
+          <li><a href="/shop" className="hover:text-warmGold transition">{t('shop')}</a></li>
+          <li><a href="/customize" className="hover:text-warmGold transition">{t('customize')}</a></li>
+          <li><a href="/wishlist" className="hover:text-warmGold transition">{t('wishlist')}</a></li>
+          <li><a href="/account" className="hover:text-warmGold transition">{t('account')}</a></li>
         </ul>
       </div>
       <div>
-        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">Contact</h4>
-        <p className="text-darkGray">123 Diamond Avenue</p>
-        <p className="text-darkGray">Global Headquarters</p>
+        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">{t('contact')}</h4>
+        <p className="text-darkGray">{t('diamondAvenue')}</p>
+        <p className="text-darkGray">{t('globalHeadquarters')}</p>
         <p className="text-darkGray">info@grownlabdiamond.com</p>
         <p className="text-darkGray">+972 3-123-4567</p>
       </div>
       <div>
-        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">Newsletter</h4>
+        <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">{t('newsletter')}</h4>
         <form className="flex flex-col gap-2">
-          <input type="email" placeholder="Your email" className="rounded-full px-4 py-2 bg-white/10 border border-navyBlue/40 text-navyBlue placeholder:text-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40" />
-          <button type="submit" className="bg-navyBlue text-white font-bold rounded-full px-4 py-2 mt-1 shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40">Subscribe</button>
+          <input type="email" placeholder={t('yourEmail')} className="rounded-full px-4 py-2 bg-white/10 border border-navyBlue/40 text-navyBlue placeholder:text-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40" />
+          <button type="submit" className="bg-navyBlue text-white font-bold rounded-full px-4 py-2 mt-1 shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40">{t('subscribe')}</button>
         </form>
       </div>
     </div>
-    <div className="text-center text-darkGray text-xs mt-10">&copy; {new Date().getFullYear()} Grown Lab Diamond. All rights reserved.</div>
+    <div className="text-center text-darkGray text-xs mt-10">&copy; {new Date().getFullYear()} Grown Lab Diamond. {t('allRightsReserved')}</div>
   </footer>
-);
+  );
+};
 
 const ADMIN_EMAILS = ['user123@gmail.com'];
 
@@ -469,27 +479,29 @@ function AdminRoute() {
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
-        <Header />
-        <main className="min-h-screen bg-white font-sans">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/customize" element={<RingCustomizer />} />
+    <LanguageProvider>
+      <CartProvider>
+        <Router>
+          <Header />
+          <main className="min-h-screen bg-white font-sans">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/customize" element={<RingCustomizer />} />
 
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/admin" element={<AdminRoute />} />
-          </Routes>
-        </main>
-        <Footer />
-      </Router>
-    </CartProvider>
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/admin" element={<AdminRoute />} />
+            </Routes>
+          </main>
+          <Footer />
+        </Router>
+      </CartProvider>
+    </LanguageProvider>
   );
 }
 

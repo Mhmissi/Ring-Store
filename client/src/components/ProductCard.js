@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const metalColors = {
   'white-gold': '#e5e4e2',
@@ -21,6 +22,7 @@ const caratOptions = [
 ];
 
 const ProductCard = ({ ring, onAddToCart }) => {
+  const { t } = useLanguage();
   const [selectedMetal, setSelectedMetal] = useState(ring.metal);
   const [selectedCarat, setSelectedCarat] = useState('1.0');
   const [zoom, setZoom] = useState(false);
@@ -249,7 +251,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
         </div>
         {/* Metal Selector as colored circles */}
         <div className="flex flex-col items-center mt-3 sm:mt-4 w-full">
-          <span className="text-xs sm:text-sm font-semibold mb-2 text-navyBlue">Choose Metal</span>
+          <span className="text-xs sm:text-sm font-semibold mb-2 text-navyBlue">{t('chooseMetal')}</span>
           <div className="flex flex-row gap-3 sm:gap-4 justify-center">
             {ring.availableMetals.map(metal => (
               <button
@@ -267,15 +269,15 @@ const ProductCard = ({ ring, onAddToCart }) => {
       <div className="flex-1 flex flex-col items-start space-y-3 sm:space-y-4 min-w-0">
         {/* Breadcrumb */}
         <div className="text-xs text-navyBlue mb-1">
-          Home / ENGAGEMENT RINGS / <span className="text-charcoalGray font-semibold">{ring.designLabel}</span>
+          {t('homeBreadcrumb')} / {t('engagementRingsBreadcrumb')} / <span className="text-charcoalGray font-semibold">{ring.designLabel}</span>
         </div>
         
         {/* Title and SKU */}
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl xl:text-3xl font-bold text-navyBlue leading-tight">{ring.designLabel} Diamond Ring</h1>
+          <h1 className="text-xl sm:text-2xl xl:text-3xl font-bold text-navyBlue leading-tight">{ring.designLabel} {t('diamondRing')}</h1>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-softGray">SKU: SH-XXXX</span>
-            <span className="bg-softBlush text-navyBlue text-xs font-semibold px-2 py-0.5 rounded-full">Natural</span>
+            <span className="text-xs text-softGray">{t('sku')}: SH-XXXX</span>
+            <span className="bg-softBlush text-navyBlue text-xs font-semibold px-2 py-0.5 rounded-full">{t('natural')}</span>
           </div>
         </div>
         
@@ -314,7 +316,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
         
         {/* Carat Selection */}
         <div className="w-full space-y-2">
-          <span className="font-semibold text-navyBlue text-xs sm:text-sm">Carat weight:</span>
+          <span className="font-semibold text-navyBlue text-xs sm:text-sm">{t('caratWeight')}:</span>
           <div className="flex flex-wrap gap-1 sm:gap-1.5">
             {caratOptions.map(opt => (
               <button
@@ -338,7 +340,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
             href={`/product/${ring.id}`} 
             className="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-navyBlue text-white font-semibold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition text-xs sm:text-sm tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105 text-center"
           >
-            View Details
+            {t('viewDetails')}
           </a>
           <button
             className="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-warmGold text-navyBlue font-semibold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition text-xs sm:text-sm tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
@@ -372,7 +374,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
               }
             }}
           >
-            Add to Cart
+            {t('addToCart')}
           </button>
         </div>
       </div>

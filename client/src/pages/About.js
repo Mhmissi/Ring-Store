@@ -1,9 +1,15 @@
-const About = () => (
+import React from "react";
+import { useLanguage } from '../contexts/LanguageContext';
+
+const About = () => {
+  const { t } = useLanguage();
+  
+  return (
   <div className="bg-pureWhite min-h-screen font-sans px-4 py-12">
     {/* Header */}
     <div className="text-center mb-12">
       <h1 className="text-4xl md:text-5xl font-serif font-bold text-navyBlue mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-        About <span className="text-warmGold">Grown Lab Diamond</span>
+        {t('about')} <span className="text-warmGold">Grown Lab Diamond</span>
       </h1>
       <div className="mx-auto w-24 h-1 bg-gradient-to-r from-navyBlue via-warmGold to-navyBlue rounded-full mb-4"></div>
     </div>
@@ -11,12 +17,12 @@ const About = () => (
     {/* Our Story */}
     <section className="mb-16">
       <h2 className="text-2xl font-serif font-bold mb-4 text-navyBlue text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-        Our Story
+        {t('ourStory')}
       </h2>
       <div className="flex justify-center">
         <div className="bg-softGray rounded-2xl shadow-elegant p-8 border border-navyBlue/20 max-w-2xl text-center">
-          <p className="text-darkGray mb-4 leading-relaxed">Grown Lab Diamond is at the forefront of the sustainable jewelry revolution. We specialize in creating stunning lab-grown diamonds that offer the same brilliance, clarity, and beauty as mined diamonds, but with a clear conscience and a smaller environmental footprint.</p>
-          <p className="text-darkGray leading-relaxed">Our mission is to provide ethically conscious consumers with access to luxury jewelry that doesn't compromise on quality or style. Every piece in our collection represents the perfect harmony of cutting-edge technology and timeless elegance.</p>
+          <p className="text-darkGray mb-4 leading-relaxed">{t('sustainableJewelry')}</p>
+          <p className="text-darkGray leading-relaxed">{t('ourMission')} {t('perfectHarmony')}</p>
         </div>
       </div>
     </section>
@@ -24,7 +30,7 @@ const About = () => (
     {/* Why Choose Us */}
     <section className="mb-16">
       <h2 className="text-2xl font-serif font-bold mb-6 text-navyBlue text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-        Why Choose Lab-Grown Diamonds?
+        {t('whyChooseLabGrown')}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {VALUES.map((v, i) => (
@@ -40,14 +46,15 @@ const About = () => (
     {/* Call to Action */}
     <section className="text-center mt-20">
       <h2 className="text-xl font-serif font-bold mb-4 text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>
-        Ready to discover sustainable luxury?
+        {t('readyToDiscover')}
       </h2>
       <a href="/shop" className="inline-block mt-3 px-8 py-3 bg-navyBlue text-white font-bold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 border border-warmGold text-lg">
-        Shop Our Collection
+        {t('shopOurCollection')}
       </a>
     </section>
   </div>
-);
+  );
+};
 
 const VALUES = [
   {

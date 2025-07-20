@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from '../lib/supabase';
 import { useCart } from '../App';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const designLabels = {
   'classic-solitaire': 'Classic Solitaire',
@@ -22,6 +23,7 @@ const shapeLabels = {
 };
 
 const Shop = () => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState([]);
   const [pricingData, setPricingData] = useState([]);
   const [discounts, setDiscounts] = useState([]);
@@ -184,13 +186,13 @@ const Shop = () => {
     return 0; // Keep original order
   });
 
-  if (loading) return <div className="text-center py-12">Loading products...</div>;
-  if (error) return <div className="text-center py-12 text-red-600">Error: {error}</div>;
+  if (loading) return <div className="text-center py-12">{t('loading')}</div>;
+  if (error) return <div className="text-center py-12 text-red-600">{t('error')}: {error}</div>;
 
   return (
   <div className="bg-pureWhite min-h-screen font-sans px-4 py-12">
     <h1 className="text-4xl font-serif font-bold text-navyBlue mb-10 text-center tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
-      Shop All Rings
+      {t('shop')} {t('engagementRings')}
     </h1>
       {/* Sort Bar */}
       <div className="flex flex-wrap gap-4 justify-center mb-8">
@@ -199,21 +201,21 @@ const Shop = () => {
           value={sortBy} 
           onChange={e => setSortBy(e.target.value)}
         >
-          <option value="default">Sort by Price</option>
-          <option value="price-low-high">Price: Low to High</option>
-          <option value="price-high-low">Price: High to Low</option>
+          <option value="default">{t('sortByPrice')}</option>
+          <option value="price-low-high">{t('priceLowHigh')}</option>
+          <option value="price-high-low">{t('priceHighLow')}</option>
         </select>
         <select 
           className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" 
           value={dateSort} 
           onChange={e => setDateSort(e.target.value)}
         >
-          <option value="default">Sort by Date</option>
-          <option value="latest">Latest</option>
-          <option value="oldest">Oldest</option>
+          <option value="default">{t('sortByDate')}</option>
+          <option value="latest">{t('latest')}</option>
+          <option value="oldest">{t('oldest')}</option>
         </select>
         <button className="px-5 py-2 bg-navyBlue text-white font-bold rounded border border-navyBlue hover:bg-warmGold hover:text-navyBlue transition" onClick={clearFilters}>
-          Clear Filters
+          {t('clearFilters')}
         </button>
         <label className="flex items-center">
           <input
@@ -223,7 +225,7 @@ const Shop = () => {
             onChange={e => handleFilterChange('showDiscountedOnly', e.target.checked)}
           />
           <span className="text-purple-700 font-medium">
-            Show Discounted Only
+            {t('showDiscountedOnly')}
           </span>
         </label>
     </div>
@@ -232,7 +234,7 @@ const Shop = () => {
     {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
         {sortedProducts.length === 0 ? (
-          <div className="col-span-full text-center text-mediumGray py-12">No products found for selected filters.</div>
+          <div className="col-span-full text-center text-mediumGray py-12">{t('noProductsFound')}</div>
         ) : sortedProducts.map((product) => {
           const imageUrl = product.public_url || (product.image_url
             ? supabase.storage.from('ring-images').getPublicUrl(product.image_url).data.publicUrl
@@ -285,7 +287,7 @@ const Shop = () => {
             {/* Button Container - Side by side */}
             <div className="flex gap-2 mt-3">
               <a href={`/product/${product.id}`} className="flex-1 px-3 py-1.5 bg-navyBlue text-white font-semibold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 text-xs tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105 text-center">
-                View Details
+                {t('viewDetails')}
               </a>
               <button
                 className="flex-1 px-3 py-1.5 bg-warmGold text-navyBlue font-semibold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-xs tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
@@ -311,12 +313,12 @@ const Shop = () => {
                 }}
                 disabled={!price}
               >
-                {addedId === product.id ? 'Added!' : (
+                {addedId === product.id ? t('added') : (
                   <span className="flex items-center justify-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0l1.7 6.385m-.383-7.822L6.75 7.5m0 0h10.5m-10.5 0l1.7 6.385m0 0A2.25 2.25 0 0010.125 16.5h3.75a2.25 2.25 0 002.175-1.615l1.7-6.385m-10.5 0h10.5" />
                     </svg>
-                    <span>Add to Cart</span>
+                    <span>{t('addToCart')}</span>
                   </span>
                 )}
               </button>
@@ -330,12 +332,12 @@ const Shop = () => {
     {/* View All Products Button - Only shows when discount filter is active */}
     {filters.showDiscountedOnly && (
       <div className="flex justify-center mt-8">
-        <button 
-          className="px-8 py-3 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-lg tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
-          onClick={() => handleFilterChange('showDiscountedOnly', false)}
-        >
-          View All Products
-        </button>
+                  <button 
+            className="px-8 py-3 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-lg tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
+            onClick={() => handleFilterChange('showDiscountedOnly', false)}
+          >
+            {t('viewAllProducts')}
+          </button>
       </div>
     )}
     

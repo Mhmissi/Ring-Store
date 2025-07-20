@@ -2,8 +2,10 @@ import React from "react";
 import { useCart } from "../App";
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Cart = () => {
+  const { t } = useLanguage();
   const { cart, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0);
@@ -18,13 +20,13 @@ const Cart = () => {
           <div className="w-20 h-20 bg-softGray rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="w-10 h-10 text-navyBlue" />
           </div>
-          <h1 className="text-2xl font-bold text-navyBlue mb-4">Your Cart is Empty</h1>
+          <h1 className="text-2xl font-bold text-navyBlue mb-4">{t('emptyCart')}</h1>
           <p className="text-darkGray mb-6">Add some beautiful rings to get started!</p>
           <button 
             onClick={() => navigate('/shop')}
             className="bg-navyBlue text-white font-bold rounded-full px-8 py-3 shadow-elegant hover:bg-warmGold hover:text-navyBlue transition"
           >
-            Continue Shopping
+            {t('continueShopping')}
           </button>
         </div>
       </div>
@@ -35,7 +37,7 @@ const Cart = () => {
     <div className="bg-pureWhite min-h-screen py-10 px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-serif font-bold mb-8 text-center text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>
-          Shopping Cart
+          {t('cart')}
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -82,7 +84,7 @@ const Cart = () => {
                       className="mt-2 text-red-500 hover:text-red-700 flex items-center text-sm"
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
-                      Remove
+                      {t('remove')}
                     </button>
                   </div>
                 </div>
@@ -93,24 +95,24 @@ const Cart = () => {
           {/* Order Summary */}
           <div className="space-y-6">
             <div className="bg-pureWhite rounded-xl shadow-elegant border border-navyBlue/10 p-6">
-              <h2 className="text-xl font-bold text-navyBlue mb-4">Order Summary</h2>
+              <h2 className="text-xl font-bold text-navyBlue mb-4">{t('orderSummary')}</h2>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-darkGray">
-                  <span>Subtotal ({cart.length} items)</span>
+                  <span>{t('subtotal')} ({cart.length} {t('items')})</span>
                   <span>${subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-darkGray">
-                  <span>Shipping</span>
+                  <span>{t('shipping')}</span>
                   <span>${shipping.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-darkGray">
-                  <span>Tax</span>
+                  <span>{t('tax')}</span>
                   <span>${tax.toLocaleString()}</span>
                 </div>
                 <div className="border-t border-lightGray pt-3">
                   <div className="flex justify-between text-lg font-bold text-navyBlue">
-                    <span>Total</span>
+                    <span>{t('total')}</span>
                     <span>${total.toLocaleString()}</span>
                   </div>
                 </div>
@@ -120,14 +122,14 @@ const Cart = () => {
                 onClick={() => navigate('/checkout')}
                 className="w-full bg-navyBlue text-white font-bold rounded-full py-4 shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200"
               >
-                Proceed to Checkout
+                {t('proceedToCheckout')}
               </button>
               
               <button 
                 onClick={() => navigate('/shop')}
                 className="w-full bg-pureWhite text-navyBlue font-bold rounded-full py-3 border border-navyBlue hover:bg-navyBlue/10 transition mt-3"
               >
-                Continue Shopping
+                {t('continueShopping')}
               </button>
             </div>
           </div>

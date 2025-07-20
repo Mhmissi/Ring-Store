@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../App";
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Wishlist = () => {
+  const { t } = useLanguage();
   const { addToCart } = useCart();
   const [wishlist, setWishlist] = useState([]);
 
@@ -19,15 +21,15 @@ const Wishlist = () => {
   const addProductToCart = (product) => {
     addToCart(product);
     removeFromWishlist(product.id);
-    alert("Added to cart!");
+    alert(t('addedToCart'));
   };
 
   if (wishlist.length === 0) {
     return (
       <div className="bg-diamondWhite min-h-screen font-sans px-4 py-12 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-brilliantBlue mb-4">Your Wishlist is Empty</h1>
-          <a href="/shop" className="text-brilliantBlue font-bold hover:underline">Shop Rings</a>
+          <h1 className="text-2xl font-bold text-brilliantBlue mb-4">{t('wishlistEmpty')}</h1>
+          <a href="/shop" className="text-brilliantBlue font-bold hover:underline">{t('shop')} {t('engagementRings')}</a>
         </div>
       </div>
     );
@@ -36,7 +38,7 @@ const Wishlist = () => {
   return (
     <div className="bg-diamondWhite min-h-screen font-sans px-4 py-12">
       <h1 className="text-4xl font-serif font-bold mb-8 text-center text-brilliantBlue" style={{ fontFamily: 'Playfair Display, serif' }}>
-        My Wishlist
+        {t('myWishlist')}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {wishlist.map(item => (
@@ -45,8 +47,8 @@ const Wishlist = () => {
             <div className="font-serif text-lg font-bold mb-1 text-center text-brilliantBlue" style={{ fontFamily: 'Playfair Display, serif' }}>{item.name}</div>
             <div className="text-champagneGold text-base mb-3 font-semibold">{item.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</div>
             <div className="flex gap-2">
-              <button className="bg-brilliantBlue text-white font-bold rounded shadow-elegant hover:bg-champagneGold hover:text-black transition text-sm tracking-wide border border-brilliantBlue px-6 py-2 mt-2" onClick={() => addProductToCart(item)}>Add to Cart</button>
-              <button className="px-4 py-2 bg-diamondWhite border border-champagneGold text-brilliantBlue rounded font-bold hover:bg-champagneGold hover:text-black transition" onClick={() => removeFromWishlist(item.id)}>Remove</button>
+              <button className="bg-brilliantBlue text-white font-bold rounded shadow-elegant hover:bg-champagneGold hover:text-black transition text-sm tracking-wide border border-brilliantBlue px-6 py-2 mt-2" onClick={() => addProductToCart(item)}>{t('addToCart')}</button>
+              <button className="px-4 py-2 bg-diamondWhite border border-champagneGold text-brilliantBlue rounded font-bold hover:bg-champagneGold hover:text-black transition" onClick={() => removeFromWishlist(item.id)}>{t('remove')}</button>
             </div>
           </div>
         ))}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from '../lib/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
 // Framer Motion import for future animation
 // import { motion } from "framer-motion";
 
@@ -40,6 +41,7 @@ const storyRingImages = [
 ];
 
 const Home = () => {
+  const { t } = useLanguage();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState('');
@@ -402,7 +404,7 @@ const Home = () => {
                 <span className="text-navyBlue/80">OFF</span>
               </div>
               <a href="/auth" className="inline-block bg-navyBlue text-white font-bold px-6 py-3 rounded-full hover:bg-navyBlue/90 transition-all duration-200">
-                Sign Up & Save
+                {t('signUpSave')}
               </a>
             </div>
             <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/20 rounded-full"></div>
@@ -421,7 +423,7 @@ const Home = () => {
                 <span className="text-blue-100">OFF</span>
               </div>
               <a href="/customize" className="inline-block bg-white text-navyBlue font-bold px-6 py-3 rounded-full hover:bg-blue-50 transition-all duration-200">
-                Start Designing
+                {t('startDesigning')}
               </a>
             </div>
             <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -434,16 +436,16 @@ const Home = () => {
     {/* Testimonials */}
     <section className="max-w-4xl mx-auto py-12 px-4">
         <h2 className="text-3xl font-serif font-bold text-navyBlue mb-10 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-        What Our Customers Say
+        {t('testimonials')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-pureWhite rounded-lg shadow-elegant p-8 border border-navyBlue/20 text-left">
-            <p className="italic text-lg mb-4 text-darkGray">"The lab-grown diamond is absolutely stunning and knowing it's ethical makes it even more special!"</p>
-            <span className="block text-navyBlue font-semibold">– Daniel S.</span>
+            <p className="italic text-lg mb-4 text-darkGray">{t('customerTestimonial1')}</p>
+            <span className="block text-navyBlue font-semibold">{t('danielS')}</span>
         </div>
           <div className="bg-pureWhite rounded-lg shadow-elegant p-8 border border-navyBlue/20 text-left">
-            <p className="italic text-lg mb-4 text-darkGray">"Incredible quality and the custom design process was seamless. Love that it's sustainable!"</p>
-            <span className="block text-navyBlue font-semibold">– Sarah L.</span>
+            <p className="italic text-lg mb-4 text-darkGray">{t('customerTestimonial2')}</p>
+            <span className="block text-navyBlue font-semibold">{t('sarahL')}</span>
         </div>
       </div>
     </section>
@@ -451,16 +453,16 @@ const Home = () => {
     {/* Bestsellers Grid */}
     <section className="max-w-6xl mx-auto py-12 px-4">
         <h2 className="text-3xl font-serif font-bold text-navyBlue mb-10 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-        Bestsellers
+        {t('bestsellers')}
       </h2>
       {loading ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-navyBlue"></div>
-          <p className="mt-4 text-mediumGray">Loading bestsellers...</p>
+          <p className="mt-4 text-mediumGray">{t('loadingBestsellers')}</p>
         </div>
       ) : bestsellers.filter(product => getDiscountForProduct(product) !== null).length === 0 ? (
         <div className="text-center py-12 text-mediumGray">
-          <p>No discounted products available at the moment.</p>
+          <p>{t('noDiscountedProducts')}</p>
         </div>
       ) : (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -549,13 +551,13 @@ const Home = () => {
       {/* About Section - Our Story */}
       <section className="max-w-6xl mx-auto py-12 px-4">
         <h2 className="text-3xl font-serif font-bold text-navyBlue mb-10 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
-          Our Story
+          {t('ourStory')}
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Text Content */}
           <div className="bg-softGray rounded-2xl shadow-elegant p-8 border border-navyBlue/20">
-            <p className="text-darkGray mb-4 leading-relaxed">Grown Lab Diamond is at the forefront of the sustainable jewelry revolution. We specialize in creating stunning lab-grown diamonds that offer the same brilliance, clarity, and beauty as mined diamonds, but with a clear conscience and a smaller environmental footprint.</p>
-            <p className="text-darkGray leading-relaxed">Our mission is to provide ethically conscious consumers with access to luxury jewelry that doesn't compromise on quality or style. Every piece in our collection represents the perfect harmony of cutting-edge technology and timeless elegance.</p>
+            <p className="text-darkGray mb-4 leading-relaxed">{t('sustainableJewelry')}</p>
+            <p className="text-darkGray leading-relaxed">{t('ourMission')} {t('perfectHarmony')}</p>
           </div>
           
           {/* Ring Slideshow */}
