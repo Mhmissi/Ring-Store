@@ -428,26 +428,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Additional Discount Info */}
-        <div className="mt-12 bg-softGray rounded-2xl p-8 border border-navyBlue/20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold text-navyBlue mb-2">🚚</div>
-              <h4 className="font-bold text-navyBlue mb-2">Free Shipping</h4>
-              <p className="text-mediumGray text-sm">On all orders over $500</p>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-navyBlue mb-2">💎</div>
-              <h4 className="font-bold text-navyBlue mb-2">Lifetime Warranty</h4>
-              <p className="text-mediumGray text-sm">On all lab-grown diamonds</p>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-navyBlue mb-2">🔄</div>
-              <h4 className="font-bold text-navyBlue mb-2">30-Day Returns</h4>
-              <p className="text-mediumGray text-sm">No questions asked</p>
-            </div>
-          </div>
-        </div>
+
     </section>
       <div className="w-full border-t border-lightGray my-12" />
     {/* Testimonials */}

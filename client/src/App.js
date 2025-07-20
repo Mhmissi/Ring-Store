@@ -105,31 +105,46 @@ const Header = () => {
   const [open, setOpen] = React.useState(false);
   return (
     <header className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/5 shadow-elegant sticky top-0 z-50 backdrop-blur-md border-b-2 border-navyBlue/10">
+      {/* Mobile Menu Backdrop */}
+      {open && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          onClick={() => setOpen(false)}
+        />
+      )}
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <a href="/" className="text-2xl font-extrabold text-navyBlue tracking-wide font-serif" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</a>
         <button className="md:hidden text-navyBlue focus:outline-none" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          {open ? (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
         </button>
-        <ul className={`flex-col md:flex-row md:flex gap-8 items-center font-semibold text-darkGray text-lg font-sans transition-all duration-300 ${open ? 'flex absolute top-20 left-0 w-full bg-pureWhite/95 py-6 z-40 border-t-2 border-navyBlue/10' : 'hidden md:flex'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+        <ul className={`flex-col md:flex-row md:flex gap-0 md:gap-8 items-center font-semibold text-darkGray text-lg font-sans transition-all duration-300 ${open ? 'flex absolute top-20 left-0 w-full bg-pureWhite py-6 z-40 border-t-2 border-navyBlue/10 shadow-lg' : 'hidden md:flex'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
           {/* Main Navigation */}
-          <li><a href="/" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Home</a></li>
-          <li><a href="/shop" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Shop</a></li>
-          <li><a href="/customize" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Customize</a></li>
-          <li><a href="/wishlist" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Wishlist</a></li>
+          <li className="w-full md:w-auto"><a href="/" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Home</a></li>
+          <li className="w-full md:w-auto"><a href="/shop" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Shop</a></li>
+          <li className="w-full md:w-auto"><a href="/customize" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Customize</a></li>
+          <li className="w-full md:w-auto"><a href="/wishlist" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-navyBlue transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Wishlist</a></li>
           {/* Divider */}
           <div className="hidden md:block w-px h-6 bg-navyBlue/20"></div>
           {/* User Actions */}
-          <li><a href="/auth" className="hover:text-warmGold transition-colors duration-200 px-2 py-1 rounded">Login / Sign Up</a></li>
-          <li>
-            <a href="/account" className="hover:text-warmGold transition-colors duration-200 px-2 py-1 rounded">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <li className="w-full md:w-auto"><a href="/auth" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">Login / Sign Up</a></li>
+          <li className="w-full md:w-auto">
+            <a href="/account" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mx-auto md:mx-0">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </a>
           </li>
-          <li>
-            <a href="/cart" className="hover:text-warmGold transition-colors duration-200 px-2 py-1 rounded relative">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <li className="w-full md:w-auto">
+            <a href="/cart" onClick={() => setOpen(false)} className="block w-full text-center md:text-left hover:text-warmGold transition-colors duration-200 px-4 py-3 md:px-2 md:py-1 rounded relative">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mx-auto md:mx-0">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0l1.7 6.385m-.383-7.822L6.75 7.5m0 0h10.5m-10.5 0l1.7 6.385m0 0A2.25 2.25 0 0010.125 16.5h3.75a2.25 2.25 0 002.175-1.615l1.7-6.385m-10.5 0h10.5" />
               </svg>
               <CartCount />

@@ -72,12 +72,6 @@ const ProductCard = ({ ring, onAddToCart }) => {
 
       if (applicableDiscount) {
         setDiscount(applicableDiscount);
-      } else {
-        // Temporary test discount for debugging - remove this later
-        setDiscount({
-          discount_percentage: 50,
-          description: 'Test discount for debugging - Black Friday Special'
-        });
       }
     };
 
@@ -181,7 +175,7 @@ const ProductCard = ({ ring, onAddToCart }) => {
           </button>
           <div
             ref={imageRef}
-            className="w-72 h-72 sm:w-96 sm:h-96 mb-3 sm:mb-4 rounded-lg shadow-elegant overflow-hidden bg-softGray relative cursor-zoom-in border border-navyBlue/10"
+            className="w-80 h-80 sm:w-[28rem] sm:h-[28rem] mb-3 sm:mb-4 rounded-lg shadow-elegant overflow-hidden bg-softGray relative cursor-zoom-in border border-navyBlue/10"
             style={{ position: 'relative' }}
             onMouseMove={handleMouseMove}
             onClick={handleImageClick}
@@ -338,41 +332,49 @@ const ProductCard = ({ ring, onAddToCart }) => {
           </div>
         </div>
         
-        {/* Add to Cart */}
-        <button
-          className="mt-2 sm:mt-3 px-4 py-2 sm:px-6 sm:py-2.5 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition text-sm sm:text-base tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
-          onClick={() => {
-            try {
-              const finalPrice = discount 
-                ? currentPrice * (1 - discount.discount_percentage / 100)
-                : currentPrice;
-              
-              onAddToCart({
-                id: ring.id,
-                name: ring.designLabel,
-                design: ring.design,
-                designLabel: ring.designLabel,
-                metal: selectedMetal,
-                metalLabel: metalLabels[selectedMetal],
-                shape: ring.shape || ring.diamond_shape,
-                shapeLabel: ring.shape || ring.diamond_shape,
-                carat: selectedCarat,
-                price: finalPrice,
-                originalPrice: currentPrice,
-                discount: discount,
-                image: imageUrl,
-                image_url: imageUrl,
-                description: ring.description,
-                qty: 1
-              });
-            } catch (error) {
-              console.error('Error adding to cart:', error);
-              alert('There was an error adding this item to your cart. Please try again.');
-            }
-          }}
-        >
-          Add to Cart
-        </button>
+        {/* Button Container - Side by side */}
+        <div className="flex gap-3 mt-2 sm:mt-3">
+          <a 
+            href={`/product/${ring.id}`} 
+            className="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-navyBlue text-white font-semibold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition text-xs sm:text-sm tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105 text-center"
+          >
+            View Details
+          </a>
+          <button
+            className="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-warmGold text-navyBlue font-semibold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition text-xs sm:text-sm tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
+            onClick={() => {
+              try {
+                const finalPrice = discount 
+                  ? currentPrice * (1 - discount.discount_percentage / 100)
+                  : currentPrice;
+                
+                onAddToCart({
+                  id: ring.id,
+                  name: ring.designLabel,
+                  design: ring.design,
+                  designLabel: ring.designLabel,
+                  metal: selectedMetal,
+                  metalLabel: metalLabels[selectedMetal],
+                  shape: ring.shape || ring.diamond_shape,
+                  shapeLabel: ring.shape || ring.diamond_shape,
+                  carat: selectedCarat,
+                  price: finalPrice,
+                  originalPrice: currentPrice,
+                  discount: discount,
+                  image: imageUrl,
+                  image_url: imageUrl,
+                  description: ring.description,
+                  qty: 1
+                });
+              } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('There was an error adding this item to your cart. Please try again.');
+              }
+            }}
+          >
+            Add to Cart
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -256,7 +256,7 @@ const Shop = () => {
           <img 
             src={imageUrl} 
             alt={`${product.design} Ring`}
-            className="w-full h-48 object-cover rounded-t-2xl group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-56 object-cover rounded-t-2xl group-hover:scale-105 transition-transform duration-300"
           />
           
           <div className="p-4 w-full">
@@ -282,42 +282,45 @@ const Shop = () => {
               )}
             </div>
             
-            <a href={`/product/${product.id}`} className="inline-block mt-auto px-6 py-2 bg-navyBlue text-white font-bold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 text-sm tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105">
-              View Details
-            </a>
-            <button
-              className="mt-2 px-6 py-2 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-sm tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
-              onClick={() => {
-                addToCart({
-                  id: product.id,
-                  name: designLabels[product.design] || product.design,
-                  design: product.design,
-                  designLabel: designLabels[product.design] || product.design,
-                  metal: product.metal,
-                  metalLabel: metalLabels[product.metal] || product.metal,
-                  shape: product.diamond_shape,
-                  shapeLabel: shapeLabels[product.diamond_shape] || product.diamond_shape,
-                  carat: product.carat,
-                  price: discountedPrice || price,
-                  originalPrice: price,
-                  discount: discount,
-                  image: imageUrl,
-                  qty: 1
-                });
-                setAddedId(product.id);
-                setTimeout(() => setAddedId(null), 1000);
-              }}
-              disabled={!price}
-            >
-              {addedId === product.id ? 'Added!' : (
-                <span className="flex items-center justify-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0l1.7 6.385m-.383-7.822L6.75 7.5m0 0h10.5m-10.5 0l1.7 6.385m0 0A2.25 2.25 0 0010.125 16.5h3.75a2.25 2.25 0 002.175-1.615l1.7-6.385m-10.5 0h10.5" />
-                  </svg>
-                  <span>Add to Cart</span>
-                </span>
-              )}
-            </button>
+            {/* Button Container - Side by side */}
+            <div className="flex gap-2 mt-3">
+              <a href={`/product/${product.id}`} className="flex-1 px-3 py-1.5 bg-navyBlue text-white font-semibold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 text-xs tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105 text-center">
+                View Details
+              </a>
+              <button
+                className="flex-1 px-3 py-1.5 bg-warmGold text-navyBlue font-semibold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-xs tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
+                onClick={() => {
+                  addToCart({
+                    id: product.id,
+                    name: designLabels[product.design] || product.design,
+                    design: product.design,
+                    designLabel: designLabels[product.design] || product.design,
+                    metal: product.metal,
+                    metalLabel: metalLabels[product.metal] || product.metal,
+                    shape: product.diamond_shape,
+                    shapeLabel: shapeLabels[product.diamond_shape] || product.diamond_shape,
+                    carat: product.carat,
+                    price: discountedPrice || price,
+                    originalPrice: price,
+                    discount: discount,
+                    image: imageUrl,
+                    qty: 1
+                  });
+                  setAddedId(product.id);
+                  setTimeout(() => setAddedId(null), 1000);
+                }}
+                disabled={!price}
+              >
+                {addedId === product.id ? 'Added!' : (
+                  <span className="flex items-center justify-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437m0 0l1.7 6.385m-.383-7.822L6.75 7.5m0 0h10.5m-10.5 0l1.7 6.385m0 0A2.25 2.25 0 0010.125 16.5h3.75a2.25 2.25 0 002.175-1.615l1.7-6.385m-10.5 0h10.5" />
+                    </svg>
+                    <span>Add to Cart</span>
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
           );
