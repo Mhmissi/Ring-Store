@@ -20,7 +20,6 @@ const AdminPanel = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   // Price management states
-  const [pricingData, setPricingData] = useState([]);
   const [editingPrices, setEditingPrices] = useState(null); // {design, prices}
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [priceForm, setPriceForm] = useState({
@@ -125,7 +124,6 @@ const AdminPanel = () => {
     fetchOrders();
     fetchMessages();
     fetchUploadedImages();
-    fetchPricingData();
     fetchDiscounts();
   }, []);
 
@@ -271,20 +269,7 @@ const AdminPanel = () => {
     }
   };
 
-  const fetchPricingData = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('ring_pricing')
-        .select('*')
-        .order('design', { ascending: true });
 
-      if (error) throw error;
-      setPricingData(data || []);
-    } catch (error) {
-      console.error('Error fetching pricing data:', error);
-      setMessage('Error fetching pricing data: ' + error.message);
-    }
-  };
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -445,7 +430,6 @@ const AdminPanel = () => {
       setMessage('✅ Prices updated successfully!');
       setShowPriceModal(false);
       setEditingPrices(null);
-      fetchPricingData();
     } catch (error) {
       console.error('Error updating prices:', error);
       setMessage('❌ Error updating prices: ' + error.message);
@@ -508,31 +492,7 @@ const AdminPanel = () => {
     return acc;
   }, {});
 
-  // Helper to generate all possible (design, metal, shape) combinations
-  const getAllCombinations = () => {
-    const combos = [];
-    for (const design of designs) {
-      for (const metal of metals) {
-        for (const shape of shapes) {
-          combos.push({
-            design: design.value,
-            metal: metal.value,
-            shape: shape.value,
-          });
-        }
-      }
-    }
-    return combos;
-  };
 
-  // Check if any image exists for this (design, metal, shape)
-  const isUploaded = (combo) => {
-    return uploadedImages.some(img =>
-      img.design === combo.design &&
-      img.metal === combo.metal &&
-      img.diamond_shape === combo.shape
-    );
-  };
 
 
 
