@@ -372,14 +372,14 @@ const Home = () => {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Black Friday Special */}
+          {/* Special Offers */}
           <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-elegant p-8 text-white relative overflow-hidden">
             <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold">
               🔥 Limited Time
             </div>
             <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-2">Black Friday Special</h3>
-              <p className="text-red-100 mb-4">Up to 50% off on selected engagement rings</p>
+              <h3 className="text-2xl font-bold mb-2">{t('specialOffers')}</h3>
+              <p className="text-red-100 mb-4">{t('upTo50Off')}</p>
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-3xl font-bold">50%</span>
                 <span className="text-red-100">OFF</span>
