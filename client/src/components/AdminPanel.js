@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Image, Settings, Trash2, Eye, AlertCircle, ChevronDown, ChevronRight, DollarSign, Edit3, Gem } from 'lucide-react';
+import { Upload, Image, Settings, Trash2, Eye, AlertCircle, ChevronDown, ChevronRight, DollarSign, Edit3, Gem, Percent, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const AdminPanel = () => {
@@ -29,6 +29,24 @@ const AdminPanel = () => {
     price_2_0ct: '',
     price_2_5ct: ''
   });
+
+  // Discount management states
+  const [discounts, setDiscounts] = useState([]);
+  const [discountsLoading, setDiscountsLoading] = useState(false);
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [editingDiscount, setEditingDiscount] = useState(null);
+  const [discountForm, setDiscountForm] = useState({
+    design: '',
+    metal: '',
+    shape: '',
+    discount_percentage: '',
+    start_date: '',
+    end_date: '',
+    description: '',
+    is_active: true
+  });
+  const [showDeleteDiscountModal, setShowDeleteDiscountModal] = useState(false);
+  const [discountToDelete, setDiscountToDelete] = useState(null);
 
   // Add after other useState hooks
   const [orders, setOrders] = useState([]);
@@ -108,7 +126,128 @@ const AdminPanel = () => {
     fetchMessages();
     fetchUploadedImages();
     fetchPricingData();
+    fetchDiscounts();
   }, []);
+
+  // Discount management functions
+  const fetchDiscounts = async () => {
+    setDiscountsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('product_discounts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setDiscounts(data || []);
+    } catch (error) {
+      setMessage('Error fetching discounts: ' + error.message);
+    } finally {
+      setDiscountsLoading(false);
+    }
+  };
+
+  const openDiscountModal = (discount = null) => {
+    if (discount) {
+      setEditingDiscount(discount);
+      setDiscountForm({
+        design: discount.design || '',
+        metal: discount.metal || '',
+        shape: discount.shape || '',
+        discount_percentage: discount.discount_percentage || '',
+        start_date: discount.start_date || '',
+        end_date: discount.end_date || '',
+        description: discount.description || '',
+        is_active: discount.is_active !== false
+      });
+    } else {
+      setEditingDiscount(null);
+      setDiscountForm({
+        design: '',
+        metal: '',
+        shape: '',
+        discount_percentage: '',
+        start_date: '',
+        end_date: '',
+        description: '',
+        is_active: true
+      });
+    }
+    setShowDiscountModal(true);
+  };
+
+  const handleDiscountSubmit = async () => {
+    try {
+      const discountData = {
+        design: discountForm.design,
+        metal: discountForm.metal,
+        shape: discountForm.shape,
+        discount_percentage: parseFloat(discountForm.discount_percentage),
+        start_date: discountForm.start_date,
+        end_date: discountForm.end_date,
+        description: discountForm.description,
+        is_active: discountForm.is_active
+      };
+
+      if (editingDiscount) {
+        // Update existing discount
+        const { error } = await supabase
+          .from('product_discounts')
+          .update(discountData)
+          .eq('id', editingDiscount.id);
+        if (error) throw error;
+        setMessage('✅ Discount updated successfully!');
+      } else {
+        // Create new discount
+        const { error } = await supabase
+          .from('product_discounts')
+          .insert(discountData);
+        if (error) throw error;
+        setMessage('✅ Discount created successfully!');
+      }
+
+      setShowDiscountModal(false);
+      fetchDiscounts();
+    } catch (error) {
+      setMessage('❌ Error saving discount: ' + error.message);
+    }
+  };
+
+  const handleDeleteDiscount = async (discountId) => {
+    setDiscountToDelete(discountId);
+    setShowDeleteDiscountModal(true);
+  };
+
+  const confirmDeleteDiscount = async () => {
+    if (!discountToDelete) return;
+    try {
+      const { error } = await supabase
+        .from('product_discounts')
+        .delete()
+        .eq('id', discountToDelete);
+      if (error) throw error;
+      setMessage('✅ Discount deleted successfully!');
+      fetchDiscounts();
+    } catch (error) {
+      setMessage('❌ Error deleting discount: ' + error.message);
+    } finally {
+      setShowDeleteDiscountModal(false);
+      setDiscountToDelete(null);
+    }
+  };
+
+  const toggleDiscountStatus = async (discountId, currentStatus) => {
+    try {
+      const { error } = await supabase
+        .from('product_discounts')
+        .update({ is_active: !currentStatus })
+        .eq('id', discountId);
+      if (error) throw error;
+      setMessage('✅ Discount status updated!');
+      fetchDiscounts();
+    } catch (error) {
+      setMessage('❌ Error updating discount status: ' + error.message);
+    }
+  };
 
   const fetchUploadedImages = async () => {
     try {
@@ -550,6 +689,7 @@ const AdminPanel = () => {
         <div className="flex justify-center space-x-12 mb-8 border-b border-brilliantBlue/30 bg-brilliantBlue/5 pt-2 pb-1 shadow-sm">
           {[
             { key: 'products', label: 'Products' },
+            { key: 'discounts', label: 'Discounts' },
             { key: 'orders', label: 'Orders' },
             { key: 'messages', label: 'Messages' },
             { key: 'reviews', label: 'Reviews' },
@@ -797,72 +937,51 @@ const AdminPanel = () => {
                             className="w-full px-4 py-2 bg-brilliantBlue/5 hover:bg-brilliantBlue/10 flex items-center justify-between text-left"
                           >
                             <span className="font-medium text-champagneGold">
-                              {getMetalLabel(metal)} ({images.length})
+                              {getMetalLabel(metal)} ({images.length} images)
                             </span>
                             {expandedSections[metal] ? (
-                              <ChevronDown className="w-4 h-4" />
+                              <ChevronDown className="w-4 h-4 text-champagneGold" />
                             ) : (
-                              <ChevronRight className="w-4 h-4" />
+                              <ChevronRight className="w-4 h-4 text-champagneGold" />
                             )}
                           </button>
-                          
                           {expandedSections[metal] && (
                             <div className="p-4 space-y-2">
-                              {images.map((image) => {
-                                const pricing = getPricingForDesign(image.design);
-                                return (
-                                  <div key={image.id} className="flex items-center justify-between p-2 bg-brilliantBlue/5 border border-brilliantBlue/30 rounded">
-                                    <div className="flex items-center space-x-3">
-                                      <img
-                                        src={image.public_url}
-                                        alt="Ring"
-                                        className="w-12 h-12 object-cover rounded"
-                                        onError={(e) => {
-                                          e.target.src = '/placeholder-ring.png';
-                                        }}
-                                      />
-                                      <div>
-                                        <p className="text-sm font-medium text-brilliantBlue">
-                                          {getDesignLabel(image.design)}
-                                        </p>
-                                        <p className="text-xs text-champagneGold">
-                                          {image.diamond_shape && getShapeLabel(image.diamond_shape)}
-                                          {image.carat && ` • ${image.carat}ct`}
-                                        </p>
-                                        <p className="text-xs text-green-600 font-medium">
-                                          1.0ct: ${pricing?.price_1_0ct?.toLocaleString() || '—'} | 
-                                          1.5ct: ${pricing?.price_1_5ct?.toLocaleString() || '—'} | 
-                                          2.0ct: ${pricing?.price_2_0ct?.toLocaleString() || '—'} | 
-                                          2.5ct: ${pricing?.price_2_5ct?.toLocaleString() || '—'}
-                                        </p>
+                              {images.map((image) => (
+                                <div key={image.id} className="flex items-center justify-between p-2 bg-white rounded border border-brilliantBlue/20">
+                                  <div className="flex items-center space-x-3">
+                                    <img
+                                      src={image.public_url}
+                                      alt={`${image.design} ${image.metal} ${image.diamond_shape}`}
+                                      className="w-12 h-12 object-cover rounded border border-brilliantBlue/20"
+                                    />
+                                    <div>
+                                      <div className="font-medium text-brilliantBlue">
+                                        {getDesignLabel(image.design)}
+                                      </div>
+                                      <div className="text-sm text-champagneGold">
+                                        {getShapeLabel(image.diamond_shape)} • {image.carat}ct
                                       </div>
                                     </div>
-                                    <div className="flex items-center space-x-1">
-                                      <button
-                                        onClick={() => openPriceModal(image.design)}
-                                        className="p-1 text-champagneGold hover:text-green-500"
-                                        title="Edit prices for this design"
-                                      >
-                                        <DollarSign className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => window.open(image.public_url, '_blank')}
-                                        className="p-1 text-champagneGold hover:text-brilliantBlue"
-                                        title="View image"
-                                      >
-                                        <Eye className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => deleteImage(image.id, image.image_url)}
-                                        className="p-1 text-champagneGold hover:text-red-500"
-                                        title="Delete image"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </div>
                                   </div>
-                                );
-                              })}
+                                  <div className="flex space-x-2">
+                                    <button
+                                      onClick={() => window.open(image.public_url, '_blank')}
+                                      className="p-1 text-brilliantBlue hover:text-champagneGold"
+                                      title="View full size"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => deleteImage(image.id, image.image_url)}
+                                      className="p-1 text-red-500 hover:text-red-700"
+                                      title="Delete image"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           )}
                         </div>
@@ -871,145 +990,109 @@ const AdminPanel = () => {
                   )}
                 </div>
               </div>
+            </div>
+          </>
+        )}
 
-              {/* Pricing Management Section */}
-              <div className="mt-8 bg-brilliantBlue/5 rounded-xl p-6 shadow-sm border border-brilliantBlue/10">
-                <h2 className="text-xl font-semibold text-brilliantBlue mb-4 flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2 text-green-500" />
-                  Pricing Management
-                </h2>
-                <p className="text-champagneGold mb-4">
-                  Set prices for each design. Prices are the same for all metals and shapes within a design.
-                </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {designs.map(design => {
-                    const pricing = getPricingForDesign(design.value);
-                    return (
-                      <div key={design.value} className="border border-brilliantBlue/30 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-semibold text-brilliantBlue">{design.label}</h3>
-                          <button
-                            onClick={() => openPriceModal(design.value)}
-                            className="p-1 text-champagneGold hover:text-green-500"
-                            title="Edit prices"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <div className="space-y-1 text-sm">
-                          <div>1.0ct: ${pricing?.price_1_0ct?.toLocaleString() || '—'}</div>
-                          <div>1.5ct: ${pricing?.price_1_5ct?.toLocaleString() || '—'}</div>
-                          <div>2.0ct: ${pricing?.price_2_0ct?.toLocaleString() || '—'}</div>
-                          <div>2.5ct: ${pricing?.price_2_5ct?.toLocaleString() || '—'}</div>
-                        </div>
+        {activeTab === 'discounts' && (
+          <>
+            {/* Header */}
+            <div className="bg-purple-50 rounded-xl p-6 mb-8 shadow-sm border border-purple-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-purple-700">Discount Management</h1>
+                  <p className="text-purple-600 mt-1">Create and manage product discounts for special promotions</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Percent className="w-5 h-5 text-purple-600" />
+                  <span className="text-sm text-purple-600">Admin Panel</span>
+                </div>
+              </div>
+              
+              {/* Message Display */}
+              {message && (
+                <div className={`p-3 rounded-md mb-4 ${
+                  message.includes('✅') 
+                    ? 'bg-green-50 border border-green-200 text-green-700' 
+                    : message.includes('❌') 
+                    ? 'bg-red-50 border border-red-200 text-red-700'
+                    : 'bg-blue-50 border border-blue-200 text-blue-700'
+                }`}>
+                  {message}
+                </div>
+              )}
+
+              {/* Add New Discount Button */}
+              <button
+                onClick={() => openDiscountModal()}
+                className="bg-purple-600 text-white font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-200 flex items-center"
+              >
+                <Tag className="w-5 h-5 mr-2" />
+                Add New Discount
+              </button>
+            </div>
+
+            {/* Discounts List */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {discountsLoading ? (
+                <div className="col-span-full text-center py-8 text-purple-600">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                  Loading discounts...
+                </div>
+              ) : discounts.length === 0 ? (
+                <div className="col-span-full text-center py-8 text-purple-600">
+                  <Percent className="w-12 h-12 mx-auto mb-2 text-purple-400" />
+                  <p>No discounts found. Create your first discount!</p>
+                </div>
+              ) : (
+                discounts.map(discount => (
+                  <div key={discount.id} className={`border rounded-lg p-4 flex flex-col ${discount.is_active ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-semibold text-purple-700">{getDesignLabel(discount.design)}</div>
+                      <div className={`px-2 py-1 rounded-full text-xs font-bold ${discount.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {discount.is_active ? 'Active' : 'Inactive'}
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Statistics */}
-              <div className="mt-8 bg-brilliantBlue/5 rounded-xl p-6 shadow-sm border border-brilliantBlue/10">
-                <h3 className="text-lg font-semibold text-brilliantBlue mb-4">Statistics</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-brilliantBlue/10 rounded-lg">
-                    <div className="text-2xl font-bold text-brilliantBlue">{uploadedImages.length}</div>
-                    <div className="text-sm text-champagneGold">Total Images</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {new Set(uploadedImages.map(img => img.metal)).size}
                     </div>
-                    <div className="text-sm text-champagneGold">Metals</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {new Set(uploadedImages.map(img => img.design)).size}
+                    <div className="text-sm text-purple-600 mb-1">{getMetalLabel(discount.metal)}</div>
+                    <div className="text-sm text-purple-600 mb-2">{getShapeLabel(discount.shape)}</div>
+                    <div className="text-lg font-bold text-purple-700 mb-2">
+                      {discount.discount_percentage}% OFF
                     </div>
-                    <div className="text-sm text-champagneGold">Designs</div>
-                  </div>
-                  <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-600">
-                      {new Set(uploadedImages.map(img => img.diamond_shape)).size}
+                    <div className="text-xs text-gray-600 mb-2">
+                      <div>Start: {new Date(discount.start_date).toLocaleDateString()}</div>
+                      <div>End: {discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'No end date'}</div>
                     </div>
-                    <div className="text-sm text-champagneGold">Shapes</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section: Uploaded Images Grid */}
-              <div className="mt-12">
-                <h2 className="text-xl font-bold mb-4 text-green-700">Uploaded Images ({uploadedImages.length})</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {uploadedImages.map((img, idx) => {
-                    const pricing = getPricingForDesign(img.design);
-                    return (
-                      <div key={img.id || idx} className="bg-green-50 border border-green-200 rounded-lg p-4 flex flex-col items-center">
-                        <img
-                          src={img.image_url ? supabase.storage.from('ring-images').getPublicUrl(img.image_url).data.publicUrl + `?t=${Date.now()}` : '/placeholder-ring.png'}
-                          alt={`${img.design} ${img.metal} ${img.diamond_shape}`}
-                          className="w-32 h-32 object-contain mb-2 rounded shadow"
-                          onError={e => { e.target.src = '/placeholder-ring.png'; }}
-                        />
-                        <div className="font-semibold mb-1">{getDesignLabel(img.design)}</div>
-                        <div className="mb-1">{getMetalLabel(img.metal)}</div>
-                        <div className="mb-1">{getShapeLabel(img.diamond_shape)}</div>
-                        <div className="text-xs text-green-600 mb-2 text-center">
-                          <div>1.0ct: ${pricing?.price_1_0ct?.toLocaleString() || '—'}</div>
-                          <div>1.5ct: ${pricing?.price_1_5ct?.toLocaleString() || '—'}</div>
-                          <div>2.0ct: ${pricing?.price_2_0ct?.toLocaleString() || '—'}</div>
-                          <div>2.5ct: ${pricing?.price_2_5ct?.toLocaleString() || '—'}</div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            className="bg-green-500 text-white font-bold px-3 py-1 rounded hover:bg-green-700 transition text-xs"
-                            onClick={() => openPriceModal(img.design)}
-                          >
-                            <DollarSign className="w-3 h-3 inline mr-1" />
-                            Prices
-                          </button>
-                          <button
-                            className="bg-red-500 text-white font-bold px-3 py-1 rounded hover:bg-red-700 transition text-xs"
-                            onClick={() => deleteImage(img.id, img.image_url)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Section: Missing Images Grid */}
-              <div className="mt-12">
-                <h2 className="text-xl font-bold mb-4 text-red-700">Images to Upload ({missingCombinations.length})</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {missingCombinations.map((combo, idx) => (
-                    <div key={idx} className="bg-red-50 border border-red-200 rounded-lg p-4 flex flex-col items-center">
-                      <div className="font-semibold mb-2">{designs.find(d => d.value === combo.design)?.label}</div>
-                      <div className="mb-1">{metals.find(m => m.value === combo.metal)?.label}</div>
-                      <div className="mb-1">{shapes.find(s => s.value === combo.shape)?.label}</div>
-                      {/* No carat shown, since not required */}
+                    {discount.description && (
+                      <div className="text-xs text-gray-600 mb-3 italic">{discount.description}</div>
+                    )}
+                    <div className="flex space-x-2 mt-auto">
                       <button
-                        className="bg-champagneGold text-black font-bold px-4 py-2 rounded hover:bg-black hover:text-champagneGold transition"
-                        onClick={() => {
-                          setSelectedDesign(combo.design);
-                          setSelectedMetal(combo.metal);
-                          setSelectedShape(combo.shape);
-                          const uploadSection = document.getElementById('upload-section');
-                          if (uploadSection) {
-                            uploadSection.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }}
+                        onClick={() => openDiscountModal(discount)}
+                        className="bg-purple-600 text-white font-bold px-3 py-1 rounded hover:bg-purple-700 transition text-xs flex-1"
                       >
-                        Upload
+                        <Edit3 className="w-3 h-3 inline mr-1" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => toggleDiscountStatus(discount.id, discount.is_active)}
+                        className={`font-bold px-3 py-1 rounded transition text-xs flex-1 ${
+                          discount.is_active 
+                            ? 'bg-yellow-600 text-white hover:bg-yellow-700' 
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}
+                      >
+                        {discount.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteDiscount(discount.id)}
+                        className="bg-red-600 text-white font-bold px-3 py-1 rounded hover:bg-red-700 transition text-xs"
+                      >
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                ))
+              )}
             </div>
           </>
         )}
@@ -1391,6 +1474,203 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+
+      {/* Discount Edit Modal */}
+      {showDiscountModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4 text-brilliantBlue flex items-center">
+              <Percent className="w-5 h-5 text-purple-500 mr-2" />
+              {editingDiscount ? 'Edit Discount' : 'New Discount'}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Design</label>
+                <select
+                  value={discountForm.design}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, design: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                >
+                  <option value="">Select Design</option>
+                  {designs.map(d => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Metal</label>
+                <select
+                  value={discountForm.metal}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, metal: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                >
+                  <option value="">Select Metal</option>
+                  {metals.map(m => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Diamond Shape</label>
+                <select
+                  value={discountForm.shape}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, shape: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                >
+                  <option value="">Select Shape</option>
+                  {shapes.map(s => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Discount Percentage (%)</label>
+                <input
+                  type="number"
+                  value={discountForm.discount_percentage}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, discount_percentage: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="10"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Start Date</label>
+                <input
+                  type="date"
+                  value={discountForm.start_date}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, start_date: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">End Date</label>
+                <input
+                  type="date"
+                  value={discountForm.end_date}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, end_date: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-1">Description</label>
+                <textarea
+                  value={discountForm.description}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  rows="3"
+                  placeholder="Discount details or notes"
+                />
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={discountForm.is_active}
+                  onChange={(e) => setDiscountForm(prev => ({ ...prev, is_active: e.target.checked }))}
+                  className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+                <label htmlFor="is_active" className="ml-2 text-sm text-champagneGold">Active</label>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => { setShowDiscountModal(false); setEditingDiscount(null); }}
+                className="px-4 py-2 rounded bg-gray-200 text-champagneGold hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDiscountSubmit}
+                className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700"
+              >
+                {editingDiscount ? 'Update Discount' : 'Create Discount'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discount Delete Confirmation Modal */}
+      {showDeleteDiscountModal && discountToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-2 text-red-500 flex items-center">
+              <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+              Confirm Deletion
+            </h3>
+            <p className="text-champagneGold mb-4">Are you sure you want to delete this discount? This action cannot be undone.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteDiscountModal(false)}
+                className="px-4 py-2 rounded bg-gray-200 text-champagneGold hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteDiscount}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discount List Section */}
+      <div className="mt-12">
+        <h2 className="text-xl font-bold mb-4 text-purple-700">Discounts ({discounts.length})</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {discountsLoading ? (
+            <div className="text-center py-8 text-champagneGold">Loading discounts...</div>
+          ) : discounts.length === 0 ? (
+            <div className="text-center py-8 text-champagneGold">No discounts found.</div>
+          ) : (
+            discounts.map(discount => (
+              <div key={discount.id} className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex flex-col items-center">
+                <div className="font-semibold mb-2">{getDesignLabel(discount.design)}</div>
+                <div className="mb-1">{getMetalLabel(discount.metal)}</div>
+                <div className="mb-1">{getShapeLabel(discount.shape)}</div>
+                <div className="text-xs text-purple-600 font-medium">
+                  Discount: {discount.discount_percentage}%
+                </div>
+                <div className="text-xs text-champagneGold mt-1">
+                  Start: {new Date(discount.start_date).toLocaleDateString()} | End: {discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'N/A'}
+                </div>
+                <div className="text-xs text-champagneGold mt-1">
+                  Status: {discount.is_active ? 'Active' : 'Inactive'}
+                </div>
+                <div className="flex space-x-2 mt-2">
+                  <button
+                    onClick={() => openDiscountModal(discount)}
+                    className="bg-purple-600 text-white font-bold px-3 py-1 rounded hover:bg-purple-700 transition text-xs"
+                  >
+                    <Edit3 className="w-3 h-3 inline mr-1" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteDiscount(discount.id)}
+                    className="bg-red-600 text-white font-bold px-3 py-1 rounded hover:bg-red-700 transition text-xs"
+                  >
+                    <Trash2 className="w-3 h-3 inline mr-1" />
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => toggleDiscountStatus(discount.id, discount.is_active)}
+                    className="bg-purple-600 text-white font-bold px-3 py-1 rounded hover:bg-purple-700 transition text-xs"
+                  >
+                    {discount.is_active ? 'Deactivate' : 'Activate'}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Modal for viewing full message */}
       {viewedMessage && (

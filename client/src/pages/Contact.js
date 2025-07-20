@@ -59,10 +59,31 @@ const Contact = () => {
         {status && <div className={`text-center mt-2 ${status.startsWith('Error') ? 'text-red-600' : 'text-green-700'}`}>{status}</div>}
       </form>
       <div className="text-center text-charcoalGray">
-        <p className="mb-1 font-semibold">Shemesh Gold</p>
-        <p>123 Gold Street, Tel Aviv, Israel</p>
-        <p>+972 3-123-4567</p>
-        <p className="mt-2">Email: <a href="mailto:info@shemeshgold.com" className="text-brilliantBlue hover:underline">info@shemeshgold.com</a></p>
+        <div className="bg-softGray rounded-xl shadow-elegant p-8 border border-navyBlue/20">
+          <h3 className="text-xl font-bold text-navyBlue mb-6">Contact Information</h3>
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-semibold text-navyBlue mb-2">Grown Lab Diamond</h4>
+              <p className="text-darkGray">Leading provider of ethically grown diamonds and sustainable luxury jewelry.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-navyBlue mb-2">Address</h4>
+              <p className="text-darkGray">123 Diamond Avenue<br />Global Headquarters</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-navyBlue mb-2">Phone</h4>
+              <p className="text-darkGray">+1 (555) 123-4567</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-navyBlue mb-2">Email</h4>
+              <p className="text-darkGray">
+                <a href="mailto:info@grownlabdiamond.com" className="text-navyBlue hover:text-warmGold transition">
+                  info@grownlabdiamond.com
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

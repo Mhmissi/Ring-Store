@@ -2,59 +2,36 @@ import React, { useEffect, useState } from "react";
 import { supabase } from '../lib/supabase';
 import { useCart } from '../App';
 
-const designOptions = [
-  '', 'classic-solitaire', 'halo-setting', 'vintage-antique', 'three-stone'
-];
-const metalOptions = [
-  '', 'white-gold', 'yellow-gold', 'rose-gold', 'platinum'
-];
-const shapeOptions = [
-  '', 'round', 'princess', 'emerald', 'oval'
-];
-const caratOptions = [
-  '', '1.0', '1.5', '2.0', '2.5'
-];
-
 const designLabels = {
-  '': 'All Designs',
   'classic-solitaire': 'Classic Solitaire',
   'halo-setting': 'Halo Setting',
   'vintage-antique': 'Vintage/Antique',
   'three-stone': 'Three Stone',
 };
 const metalLabels = {
-  '': 'All Metals',
   'white-gold': 'White Gold',
   'yellow-gold': 'Yellow Gold',
   'rose-gold': 'Rose Gold',
   'platinum': 'Platinum',
 };
 const shapeLabels = {
-  '': 'All Shapes',
   'round': 'Round',
   'princess': 'Princess',
   'emerald': 'Emerald',
   'oval': 'Oval',
 };
-const caratLabels = {
-  '': 'All Carats',
-  '1.0': '1.0 ct',
-  '1.5': '1.5 ct',
-  '2.0': '2.0 ct',
-  '2.5': '2.5 ct',
-};
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
   const [pricingData, setPricingData] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    design: '',
-    metal: '',
-    shape: '',
-    carat: '',
+    showDiscountedOnly: false,
   });
+  const [sortBy, setSortBy] = useState('default'); // 'default', 'price-low-high', 'price-high-low'
+  const [dateSort, setDateSort] = useState('default'); // 'default', 'latest', 'oldest'
   const { addToCart } = useCart();
   const [addedId, setAddedId] = useState(null);
 
@@ -80,12 +57,24 @@ const Shop = () => {
 
         if (pricingError) throw pricingError;
 
+        // Fetch active discounts (temporarily removing date filter for testing)
+        const { data: discountsData, error: discountsError } = await supabase
+          .from('product_discounts')
+          .select('*')
+          .eq('is_active', true);
+
+        if (discountsError) throw discountsError;
+
+        console.log('Fetched discounts:', discountsData); // Debug log
+
         setProducts(productsData || []);
         setPricingData(pricingData || []);
+        setDiscounts(discountsData || []);
       } catch (error) {
         setError(error.message);
         setProducts([]);
         setPricingData([]);
+        setDiscounts([]);
       } finally {
         setLoading(false);
       }
@@ -98,7 +87,9 @@ const Shop = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ design: '', metal: '', shape: '', carat: '' });
+    setFilters({ showDiscountedOnly: false });
+    setSortBy('default');
+    setDateSort('default');
   };
 
   // Get pricing for a design and carat
@@ -123,13 +114,74 @@ const Shop = () => {
     }
   };
 
+  // Get discount for a product
+  const getDiscountForProduct = (product) => {
+    const applicableDiscounts = discounts.filter(discount => {
+      const designMatch = !discount.design || discount.design === product.design;
+      const metalMatch = !discount.metal || discount.metal === product.metal;
+      const shapeMatch = !discount.shape || discount.shape === product.diamond_shape;
+      return designMatch && metalMatch && shapeMatch;
+    });
+    
+    // Return the highest discount percentage
+    if (applicableDiscounts.length > 0) {
+      return applicableDiscounts.reduce((max, discount) => 
+        discount.discount_percentage > max.discount_percentage ? discount : max
+      );
+    }
+    return null;
+  };
+
+  // Calculate discounted price
+  const getDiscountedPrice = (product) => {
+    const discount = getDiscountForProduct(product);
+    if (!discount) return null;
+    const originalPrice = getPriceForDesignAndCarat(product.design, product.carat);
+    if (!originalPrice) return null;
+    return originalPrice * (1 - discount.discount_percentage / 100);
+  };
+
   const filteredProducts = products.filter(product => {
+    const hasDiscount = getDiscountForProduct(product) !== null;
+    
     return (
-      (!filters.design || product.design === filters.design) &&
-      (!filters.metal || product.metal === filters.metal) &&
-      (!filters.shape || product.diamond_shape === filters.shape) &&
-      (!filters.carat || (product.carat && product.carat.toString() === filters.carat))
+      (!filters.showDiscountedOnly || hasDiscount)
     );
+  });
+
+  // Sort products based on price and date
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    // First sort by price if specified
+    if (sortBy !== 'default') {
+      const priceA = getDiscountedPrice(a) || getPriceForDesignAndCarat(a.design, a.carat) || 0;
+      const priceB = getDiscountedPrice(b) || getPriceForDesignAndCarat(b.design, b.carat) || 0;
+      
+      switch (sortBy) {
+        case 'price-low-high':
+          return priceA - priceB;
+        case 'price-high-low':
+          return priceB - priceA;
+        default:
+          break;
+      }
+    }
+    
+    // Then sort by date if specified
+    if (dateSort !== 'default') {
+      const dateA = new Date(a.created_at || a.id);
+      const dateB = new Date(b.created_at || b.id);
+      
+      switch (dateSort) {
+        case 'latest':
+          return dateB - dateA; // Newest first
+        case 'oldest':
+          return dateA - dateB; // Oldest first
+        default:
+          break;
+      }
+    }
+    
+    return 0; // Keep original order
   });
 
   if (loading) return <div className="text-center py-12">Loading products...</div>;
@@ -140,43 +192,96 @@ const Shop = () => {
     <h1 className="text-4xl font-serif font-bold text-navyBlue mb-10 text-center tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
       Shop All Rings
     </h1>
-      {/* Filter Bar */}
+      {/* Sort Bar */}
       <div className="flex flex-wrap gap-4 justify-center mb-8">
-        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.design} onChange={e => handleFilterChange('design', e.target.value)}>
-          {designOptions.map(opt => <option key={opt} value={opt}>{designLabels[opt]}</option>)}
+        <select 
+          className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" 
+          value={sortBy} 
+          onChange={e => setSortBy(e.target.value)}
+        >
+          <option value="default">Sort by Price</option>
+          <option value="price-low-high">Price: Low to High</option>
+          <option value="price-high-low">Price: High to Low</option>
         </select>
-        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.metal} onChange={e => handleFilterChange('metal', e.target.value)}>
-          {metalOptions.map(opt => <option key={opt} value={opt}>{metalLabels[opt]}</option>)}
-      </select>
-        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.shape} onChange={e => handleFilterChange('shape', e.target.value)}>
-          {shapeOptions.map(opt => <option key={opt} value={opt}>{shapeLabels[opt]}</option>)}
-      </select>
-        <select className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" value={filters.carat} onChange={e => handleFilterChange('carat', e.target.value)}>
-          {caratOptions.map(opt => <option key={opt} value={opt}>{caratLabels[opt]}</option>)}
-      </select>
+        <select 
+          className="border border-navyBlue/30 rounded px-5 py-2 text-darkGray bg-softGray focus:outline-navyBlue" 
+          value={dateSort} 
+          onChange={e => setDateSort(e.target.value)}
+        >
+          <option value="default">Sort by Date</option>
+          <option value="latest">Latest</option>
+          <option value="oldest">Oldest</option>
+        </select>
         <button className="px-5 py-2 bg-navyBlue text-white font-bold rounded border border-navyBlue hover:bg-warmGold hover:text-navyBlue transition" onClick={clearFilters}>
           Clear Filters
         </button>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            className="mr-2"
+            checked={filters.showDiscountedOnly}
+            onChange={e => handleFilterChange('showDiscountedOnly', e.target.checked)}
+          />
+          <span className="text-purple-700 font-medium">
+            Show Discounted Only
+          </span>
+        </label>
     </div>
       <div className="w-full border-t border-lightGray my-8" />
+      
     {/* Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-        {filteredProducts.length === 0 ? (
+        {sortedProducts.length === 0 ? (
           <div className="col-span-full text-center text-mediumGray py-12">No products found for selected filters.</div>
-        ) : filteredProducts.map((product) => {
+        ) : sortedProducts.map((product) => {
           const imageUrl = product.public_url || (product.image_url
             ? supabase.storage.from('ring-images').getPublicUrl(product.image_url).data.publicUrl
             : '/placeholder-ring.png');
           const price = getPriceForDesignAndCarat(product.design, product.carat);
+          const discount = getDiscountForProduct(product);
+          const discountedPrice = discount ? getDiscountedPrice(product) : price;
+          
+          // Debug logging
+          console.log('Product:', product.design, 'Price:', price, 'Discount:', discount, 'Discounted Price:', discountedPrice);
+          
           return (
         <div key={product.id} className="bg-softGray rounded-2xl shadow-elegant border border-navyBlue/20 hover:border-navyBlue transition-all duration-300 flex flex-col items-center group overflow-hidden relative">
-          <div className="w-full h-56 flex items-center justify-center overflow-hidden rounded-t-2xl bg-pureWhite">
-                <img src={imageUrl} alt={product.design} className="w-full h-full object-cover transform group-hover:scale-105 group-hover:-translate-y-1 transition-transform duration-300 ease-in-out" onError={e => { e.target.src = '/placeholder-ring.png'; }} />
-          </div>
-          <div className="p-5 w-full flex flex-col items-center">
-                <div className="font-serif text-lg font-bold mb-1 text-center text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>{designLabels[product.design] || product.design}</div>
-                <div className="text-darkGray text-sm mb-1">{metalLabels[product.metal] || product.metal} • {shapeLabels[product.diamond_shape] || product.diamond_shape} • {product.carat ? `${product.carat} ct` : ''}</div>
-                <div className="text-warmGold text-base mb-3 font-semibold">{price ? `$${price.toLocaleString()}` : 'Price on request'}</div>
+          {/* Discount Badge */}
+          {discount && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              {discount.discount_percentage}% OFF
+            </div>
+          )}
+          
+          <img 
+            src={imageUrl} 
+            alt={`${product.design} Ring`}
+            className="w-full h-48 object-cover rounded-t-2xl group-hover:scale-105 transition-transform duration-300"
+          />
+          
+          <div className="p-4 w-full">
+            <h3 className="text-lg font-bold text-navyBlue mb-2">{product.design}</h3>
+            <p className="text-darkGray text-sm mb-2">{product.metal} • {product.diamond_shape} • {product.carat} ct</p>
+            
+            {/* Price Display - Show both old and new prices side by side */}
+            <div className="mb-3">
+              {discount && discountedPrice ? (
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold text-red-600">${Math.round(discountedPrice).toLocaleString()}</span>
+                    <span className="text-gray-500 text-sm line-through">
+                      ${Math.round(price).toLocaleString()}
+                    </span>
+                  </div>
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {discount.discount_percentage}% OFF
+                  </span>
+                </div>
+              ) : (
+                <span className="text-lg font-bold text-warmGold">${price ? Math.round(price).toLocaleString() : 'Price on request'}</span>
+              )}
+            </div>
+            
             <a href={`/product/${product.id}`} className="inline-block mt-auto px-6 py-2 bg-navyBlue text-white font-bold rounded-full shadow-elegant hover:bg-warmGold hover:text-navyBlue transition-all duration-200 text-sm tracking-wide border border-navyBlue focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105">
               View Details
             </a>
@@ -193,7 +298,9 @@ const Shop = () => {
                   shape: product.diamond_shape,
                   shapeLabel: shapeLabels[product.diamond_shape] || product.diamond_shape,
                   carat: product.carat,
-                  price: price,
+                  price: discountedPrice || price,
+                  originalPrice: price,
+                  discount: discount,
                   image: imageUrl,
                   qty: 1
                 });
@@ -216,6 +323,19 @@ const Shop = () => {
           );
         })}
     </div>
+    
+    {/* View All Products Button - Only shows when discount filter is active */}
+    {filters.showDiscountedOnly && (
+      <div className="flex justify-center mt-8">
+        <button 
+          className="px-8 py-3 bg-warmGold text-navyBlue font-bold rounded-full shadow-elegant hover:bg-navyBlue hover:text-white transition-all duration-200 text-lg tracking-wide border border-warmGold focus:outline-none focus:ring-2 focus:ring-navyBlue/40 hover:scale-105"
+          onClick={() => handleFilterChange('showDiscountedOnly', false)}
+        >
+          View All Products
+        </button>
+      </div>
+    )}
+    
     <style>{`
       .text-navyBlue { color: #2c3e50; }
       .border-navyBlue { border-color: #2c3e50; }

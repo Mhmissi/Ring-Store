@@ -291,14 +291,11 @@ const RingCustomizer = () => {
     <div className="min-h-screen bg-diamondWhite flex flex-col items-center overflow-x-hidden">
       <div className="w-full max-w-xl px-2 sm:px-4 flex flex-col items-center">
         {/* Header */}
-        <div className="text-center mt-2 mb-2">
-          <div className="flex items-center justify-center mb-1">
-            <Diamond className="w-4 h-4 text-brilliantBlue mr-1" />
-            <h1 className="text-base font-bold bg-gradient-to-r from-brilliantBlue to-champagneGold bg-clip-text text-transparent">
-              Shemesh Gold
-            </h1>
-          </div>
-          <p className="text-xs text-charcoalGray">Start customizing your dream ring</p>
+        <div className="text-center mb-4">
+          <h1 className="text-2xl font-bold text-navyBlue mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Grown Lab Diamond
+          </h1>
+          <p className="text-xs text-gray-600">Start customizing your dream ring</p>
         </div>
         {/* Ring Preview */}
         <div className="w-full flex flex-col items-center mb-1 relative">

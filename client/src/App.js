@@ -13,8 +13,7 @@ import './index.css';
 import AdminLogin from './pages/AdminLogin';
 import ChangePassword from './components/ChangePassword';
 import AuthPage from './pages/AuthPage';
-import Contact from './pages/Contact';
-import About from './pages/About';
+
 import { supabase } from './lib/supabase';
 
 // Remove unused imports
@@ -117,11 +116,6 @@ const Header = () => {
           <li><a href="/shop" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Shop</a></li>
           <li><a href="/customize" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Customize</a></li>
           <li><a href="/wishlist" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Wishlist</a></li>
-          {/* Divider */}
-          <div className="hidden md:block w-px h-6 bg-navyBlue/20"></div>
-          {/* Company Info */}
-          <li><a href="/about" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">About</a></li>
-          <li><a href="/contact" className="hover:text-navyBlue transition-colors duration-200 px-2 py-1 rounded">Contact</a></li>
           {/* Divider */}
           <div className="hidden md:block w-px h-6 bg-navyBlue/20"></div>
           {/* User Actions */}
@@ -404,7 +398,7 @@ const Footer = () => (
         <div className="flex gap-4 mt-2">
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2.1c-3.9 0-7 3.1-7 7v2H7v3h3v7h3v-7h2.1l.4-3H13V9c0-1.1.9-2 2-2h2V4.1c0-1.1-.9-2-2-2z"/></svg></a>
-          <a href="mailto:info@shemeshjewelry.com" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4zm2 0v.01L12 13l8-8.99V4H4zm16 2.41l-7.29 7.3a1 1 0 0 1-1.42 0L4 6.41V20h16V6.41z"/></svg></a>
+          <a href="mailto:info@grownlabdiamond.com" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4zm2 0v.01L12 13l8-8.99V4H4zm16 2.41l-7.29 7.3a1 1 0 0 1-1.42 0L4 6.41V20h16V6.41z"/></svg></a>
         </div>
       </div>
       <div>
@@ -414,14 +408,13 @@ const Footer = () => (
           <li><a href="/customize" className="hover:text-warmGold transition">Customize</a></li>
           <li><a href="/wishlist" className="hover:text-warmGold transition">Wishlist</a></li>
           <li><a href="/account" className="hover:text-warmGold transition">Account</a></li>
-          <li><a href="/about" className="hover:text-warmGold transition">About</a></li>
-          <li><a href="/contact" className="hover:text-warmGold transition">Contact</a></li>
         </ul>
       </div>
       <div>
         <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">Contact</h4>
-        <p className="text-darkGray">123 Diamond Ave, Tel Aviv</p>
-        <p className="text-darkGray">info@shemeshjewelry.com</p>
+        <p className="text-darkGray">123 Diamond Avenue</p>
+        <p className="text-darkGray">Global Headquarters</p>
+        <p className="text-darkGray">info@grownlabdiamond.com</p>
         <p className="text-darkGray">+972 3-123-4567</p>
       </div>
       <div>
@@ -474,8 +467,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/account" element={<Account />} />
             <Route path="/customize" element={<RingCustomizer />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
+
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin" element={<AdminRoute />} />
           </Routes>
