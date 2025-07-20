@@ -116,7 +116,10 @@ const Header = () => {
         />
       )}
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <a href="/" className="text-2xl font-extrabold text-navyBlue tracking-wide font-serif" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</a>
+        <a href="/" className="flex items-center space-x-2 text-2xl font-extrabold text-navyBlue tracking-wide font-serif" style={{ fontFamily: 'Playfair Display, serif' }}>
+          <img src="/ringstestimages/diamond.png" alt="Diamond Logo" className="w-8 h-8" />
+          <span>Grown Lab Diamond</span>
+        </a>
         <button className="md:hidden text-navyBlue focus:outline-none" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? (
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -417,7 +420,10 @@ const Footer = () => {
   <footer className="bg-gradient-to-br from-pureWhite via-softGray to-navyBlue/10 text-navyBlue pt-12 pb-6 px-4 mt-16 border-t border-navyBlue/20">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
       <div>
-        <h3 className="font-serif text-2xl font-bold mb-3 text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</h3>
+        <div className="flex items-center space-x-2 mb-3">
+          <img src="/ringstestimages/diamond.png" alt="Diamond Logo" className="w-8 h-8" />
+          <h3 className="font-serif text-2xl font-bold text-navyBlue" style={{ fontFamily: 'Playfair Display, serif' }}>Grown Lab Diamond</h3>
+        </div>
         <p className="text-darkGray mb-4">{t('exquisiteLabGrown')}</p>
         <div className="flex gap-4 mt-2">
           <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-warmGold transition"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm5.25.75a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg></a>
