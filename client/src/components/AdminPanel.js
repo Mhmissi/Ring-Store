@@ -424,18 +424,7 @@ const AdminPanel = () => {
     setDeleteTarget(null);
   };
 
-  // Price management functions
-  const openPriceModal = (design) => {
-    const pricing = pricingData.find(p => p.design === design);
-    setEditingPrices({ design });
-    setPriceForm({
-      price_1_0ct: pricing?.price_1_0ct || '',
-      price_1_5ct: pricing?.price_1_5ct || '',
-      price_2_0ct: pricing?.price_2_0ct || '',
-      price_2_5ct: pricing?.price_2_5ct || ''
-    });
-    setShowPriceModal(true);
-  };
+
 
   const handlePriceUpdate = async () => {
     if (!editingPrices) return;
@@ -493,10 +482,7 @@ const AdminPanel = () => {
     return shapes.find(s => s.value === value)?.label || value;
   };
 
-  // Get pricing for a design
-  const getPricingForDesign = (design) => {
-    return pricingData.find(p => p.design === design);
-  };
+
 
   // Filter and search images
   const filteredImages = uploadedImages.filter(image => {
@@ -548,9 +534,7 @@ const AdminPanel = () => {
     );
   };
 
-  const missingCombinations = getAllCombinations().filter(combo =>
-    combo.design && combo.metal && combo.shape && !isUploaded(combo)
-  );
+
 
   // Helper to fetch product images for order items
   async function fetchOrderItemImages(items) {
