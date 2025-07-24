@@ -144,6 +144,38 @@ GRANT INSERT, UPDATE, DELETE ON ring_images TO authenticated;
 GRANT SELECT ON ring_image_summary TO anon;
 GRANT SELECT ON ring_image_summary TO authenticated;
 
+-- Create products table for general and special products
+CREATE TABLE IF NOT EXISTS products (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    image_url TEXT,
+    is_special BOOLEAN DEFAULT false,
+    is_visible BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Allow public read access
+CREATE POLICY "Allow public read access to products" ON products
+    FOR SELECT USING (is_visible = true);
+
+-- Policy: Allow authenticated users to manage products (customize as needed)
+CREATE POLICY "Allow authenticated users to manage products" ON products
+    FOR ALL USING (auth.role() = 'authenticated');
+
+-- Trigger to update updated_at
+CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Grant permissions
+GRANT SELECT ON products TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON products TO authenticated;
+
 -- Storage Bucket Setup (run these commands in Supabase Dashboard > Storage)
 -- 1. Create a new bucket called 'ring-images'
 -- 2. Set the bucket to public
