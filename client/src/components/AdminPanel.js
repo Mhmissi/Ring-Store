@@ -61,7 +61,6 @@ const AdminPanel = () => {
   const [viewedMessage, setViewedMessage] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
   const [replyText, setReplyText] = useState("");
-  const [sendingReply, setSendingReply] = useState(false);
 
   // Updated options based on your specifications
   const designs = [
@@ -260,7 +259,7 @@ const AdminPanel = () => {
 
       if (error) throw error;
       setUploadedImages(data || []);
-      console.log('Updated uploadedImages:', data); // Debug log
+      
     } catch (error) {
       console.error('Error fetching images:', error);
       setMessage('Error fetching uploaded images: ' + error.message);
@@ -377,7 +376,7 @@ const AdminPanel = () => {
     if (!deleteTarget) return;
     try {
       // Debug: log the path being deleted
-      console.log('Attempting to delete from storage:', deleteTarget.imageUrl);
+      
       const { error: storageError } = await supabase.storage
         .from('ring-images')
         .remove([deleteTarget.imageUrl]);
@@ -602,26 +601,188 @@ const AdminPanel = () => {
     }
   };
 
-  // Handler to send reply
-  const handleSendReply = async () => {
-    if (!replyText.trim() || !viewedMessage) return;
-    setSendingReply(true);
+  // Handler to send reply (currently unused - UI not implemented)
+  // const handleSendReply = async () => {
+  //   if (!replyText.trim() || !viewedMessage) return;
+  //   try {
+  //     const { error } = await supabase
+  //       .from('messages')
+  //       .update({ reply: replyText, replied_at: new Date().toISOString(), status: 'responded' })
+  //       .eq('id', viewedMessage.id);
+  //     if (error) throw error;
+  //     setMessageActionMessage('Reply sent and saved!');
+  //     setViewedMessage({ ...viewedMessage, reply: replyText, replied_at: new Date().toISOString(), status: 'responded' });
+  //     setReplyText("");
+  //     fetchMessages();
+  //     setTimeout(() => setMessageActionMessage(''), 2000);
+  //   } catch (err) {
+  //     setMessageActionMessage('Error sending reply: ' + err.message);
+  //     setTimeout(() => setMessageActionMessage(''), 3000);
+  //   }
+  // };
+
+  // Add state for editing image
+  const [editingImage, setEditingImage] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    design: '',
+    metal: '',
+    diamond_shape: '',
+    carat: '',
+    image_url: '',
+    public_url: '',
+    id: null
+  });
+  const [editPreviewUrl, setEditPreviewUrl] = useState('');
+
+  // Handler to open edit modal
+  const handleEditImage = (image) => {
+    setEditingImage(image);
+    setEditForm({
+      design: image.design,
+      metal: image.metal,
+      diamond_shape: image.diamond_shape,
+      carat: image.carat,
+      image_url: image.image_url,
+      public_url: image.public_url,
+      id: image.id
+    });
+    setEditPreviewUrl(image.public_url);
+    setShowEditModal(true);
+  };
+
+  const handleEditFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setMessage('Please select an image file (PNG, JPG, etc.)');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage('File size must be less than 5MB');
+        return;
+      }
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setEditPreviewUrl(url);
+      setMessage('');
+    }
+  };
+
+  const handleEditImageSubmit = async (e) => {
+    e.preventDefault();
+    if (!editForm.design || !editForm.metal || !editForm.diamond_shape || !editForm.carat) {
+      setMessage('Please fill in all required fields for editing.');
+      return;
+    }
+    let newImageUrl = editForm.image_url;
+    let newPublicUrl = editForm.public_url;
+    let oldImageUrl = editForm.image_url;
     try {
-      const { error } = await supabase
-        .from('messages')
-        .update({ reply: replyText, replied_at: new Date().toISOString(), status: 'responded' })
-        .eq('id', viewedMessage.id);
+      if (selectedFile) {
+        // Build new path
+        const newPath = `rings/${editForm.design}/${editForm.metal}/${editForm.diamond_shape}/${editForm.carat}ct.png`;
+        // Remove old image from storage if path changes
+        if (oldImageUrl && oldImageUrl !== newPath) {
+          await supabase.storage.from('ring-images').remove([oldImageUrl]);
+        }
+        // Upload new file
+        const { error: uploadError } = await supabase.storage.from('ring-images').upload(newPath, selectedFile, { cacheControl: '3600', upsert: true });
+        if (uploadError) throw uploadError;
+        // Get new public URL
+        const { data: urlData } = supabase.storage.from('ring-images').getPublicUrl(newPath);
+        newImageUrl = newPath;
+        newPublicUrl = urlData.publicUrl;
+      }
+      // Update DB
+      const { error: updateError } = await supabase
+        .from('ring_images')
+        .update({
+          design: editForm.design,
+          metal: editForm.metal,
+          diamond_shape: editForm.diamond_shape,
+          carat: parseFloat(editForm.carat),
+          image_url: newImageUrl,
+          public_url: newPublicUrl
+        })
+        .eq('id', editForm.id);
+      if (updateError) throw updateError;
+      setMessage('✅ Image updated successfully!');
+      setShowEditModal(false);
+      setEditingImage(null);
+      setEditForm({ design: '', metal: '', diamond_shape: '', carat: '', image_url: '', public_url: '', id: null });
+      setEditPreviewUrl('');
+      setSelectedFile(null);
+      fetchUploadedImages();
+    } catch (error) {
+      console.error('Error updating image:', error);
+      setMessage('❌ Error updating image: ' + error.message);
+    }
+  };
+
+  // Product management state
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    is_special: false,
+    is_visible: true,
+    imageFile: null,
+    imagePreview: ''
+  });
+  const [productUploading, setProductUploading] = useState(false);
+
+  // Fetch products from new table
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
       if (error) throw error;
-      setMessageActionMessage('Reply sent and saved!');
-      setViewedMessage({ ...viewedMessage, reply: replyText, replied_at: new Date().toISOString(), status: 'responded' });
-      setReplyText("");
-      fetchMessages();
-      setTimeout(() => setMessageActionMessage(''), 2000);
-    } catch (err) {
-      setMessageActionMessage('Error sending reply: ' + err.message);
-      setTimeout(() => setMessageActionMessage(''), 3000);
+      setProducts(data || []);
+    } catch (error) {
+      setMessage('Error fetching products: ' + error.message);
     } finally {
-      setSendingReply(false);
+      setLoadingProducts(false);
+    }
+  };
+
+  // Fetch products on mount
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleProductSubmit = async (e) => {
+    e.preventDefault();
+    setProductUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', productForm.name);
+      formData.append('description', productForm.description);
+      formData.append('price', productForm.price);
+      formData.append('is_special', productForm.is_special);
+      formData.append('is_visible', productForm.is_visible);
+      if (productForm.imageFile) {
+        formData.append('image', productForm.imageFile);
+      }
+      const { data, error } = await supabase
+        .from('products')
+        .insert([{ ...productForm, created_at: new Date().toISOString() }])
+        .select();
+      if (error) throw error;
+      setProducts(prevProducts => [...prevProducts, data[0]]);
+      setProductForm({ name: '', description: '', price: '', is_special: false, is_visible: true, imageFile: null, imagePreview: '' });
+      setShowProductModal(false);
+      setProductUploading(false);
+      setMessage('✅ Product added successfully!');
+    } catch (error) {
+      setMessage('❌ Error adding product: ' + error.message);
+      setProductUploading(false);
     }
   };
 
@@ -633,6 +794,7 @@ const AdminPanel = () => {
         <div className="flex justify-center space-x-12 mb-8 border-b border-brilliantBlue/30 bg-brilliantBlue/5 pt-2 pb-1 shadow-sm">
           {[
             { key: 'products', label: 'Products' },
+            { key: 'catalog', label: 'Product Catalog' },
             { key: 'discounts', label: 'Discounts' },
             { key: 'orders', label: 'Orders' },
             { key: 'messages', label: 'Messages' },
@@ -915,6 +1077,13 @@ const AdminPanel = () => {
                                       title="View full size"
                                     >
                                       <Eye className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleEditImage(image)}
+                                      className="p-1 text-yellow-500 hover:text-yellow-700"
+                                      title="Edit image"
+                                    >
+                                      <Edit3 className="w-4 h-4" />
                                     </button>
                                     <button
                                       onClick={() => deleteImage(image.id, image.image_url)}
@@ -1565,114 +1734,254 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* Discount List Section */}
-      <div className="mt-12">
-        <h2 className="text-xl font-bold mb-4 text-purple-700">Discounts ({discounts.length})</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {discountsLoading ? (
-            <div className="text-center py-8 text-champagneGold">Loading discounts...</div>
-          ) : discounts.length === 0 ? (
-            <div className="text-center py-8 text-champagneGold">No discounts found.</div>
-          ) : (
-            discounts.map(discount => (
-              <div key={discount.id} className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex flex-col items-center">
-                <div className="font-semibold mb-2">{getDesignLabel(discount.design)}</div>
-                <div className="mb-1">{getMetalLabel(discount.metal)}</div>
-                <div className="mb-1">{getShapeLabel(discount.shape)}</div>
-                <div className="text-xs text-purple-600 font-medium">
-                  Discount: {discount.discount_percentage}%
-                </div>
-                <div className="text-xs text-champagneGold mt-1">
-                  Start: {new Date(discount.start_date).toLocaleDateString()} | End: {discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'N/A'}
-                </div>
-                <div className="text-xs text-champagneGold mt-1">
-                  Status: {discount.is_active ? 'Active' : 'Inactive'}
-                </div>
-                <div className="flex space-x-2 mt-2">
-                  <button
-                    onClick={() => openDiscountModal(discount)}
-                    className="bg-purple-600 text-white font-bold px-3 py-1 rounded hover:bg-purple-700 transition text-xs"
-                  >
-                    <Edit3 className="w-3 h-3 inline mr-1" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteDiscount(discount.id)}
-                    className="bg-red-600 text-white font-bold px-3 py-1 rounded hover:bg-red-700 transition text-xs"
-                  >
-                    <Trash2 className="w-3 h-3 inline mr-1" />
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => toggleDiscountStatus(discount.id, discount.is_active)}
-                    className="bg-purple-600 text-white font-bold px-3 py-1 rounded hover:bg-purple-700 transition text-xs"
-                  >
-                    {discount.is_active ? 'Deactivate' : 'Activate'}
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Modal for viewing full message */}
-      {viewedMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-lg w-full relative">
-            <button
-              onClick={() => setViewedMessage(null)}
-              className="absolute top-2 right-2 text-champagneGold hover:text-black text-xl font-bold"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-            <h3 className="text-xl font-bold mb-2 text-brilliantBlue">Message from {viewedMessage.name}</h3>
-            <div className="mb-2 text-champagneGold"><strong>Email:</strong> {viewedMessage.email}</div>
-            <div className="mb-2 text-champagneGold"><strong>Date:</strong> {new Date(viewedMessage.created_at).toLocaleString()}</div>
-            <div className="mb-4 text-brilliantBlue whitespace-pre-line"><strong>Message:</strong><br />{viewedMessage.message}</div>
-            {viewedMessage.reply ? (
-              <div className="mb-4 p-3 bg-brilliantBlue/10 rounded border border-brilliantBlue/20">
-                <div className="font-bold text-brilliantBlue mb-1">Your Reply:</div>
-                <div className="text-champagneGold whitespace-pre-line">{viewedMessage.reply}</div>
-                <div className="text-xs text-champagneGold mt-1">Sent: {viewedMessage.replied_at ? new Date(viewedMessage.replied_at).toLocaleString() : ''}</div>
-              </div>
-            ) : (
-              <div className="mb-4">
-                <textarea
-                  className="w-full border border-brilliantBlue/30 rounded p-2 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-brilliantBlue/40"
-                  placeholder="Type your reply here..."
-                  value={replyText}
-                  onChange={e => setReplyText(e.target.value)}
-                  disabled={sendingReply}
-                />
-                <button
-                  onClick={handleSendReply}
-                  className="mt-2 bg-brilliantBlue text-champagneGold px-4 py-2 rounded font-bold hover:bg-champagneGold disabled:opacity-50"
-                  disabled={sendingReply || !replyText.trim()}
+      {/* Edit Image Modal */}
+      {showEditModal && editingImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-2 text-brilliantBlue flex items-center">
+              <Edit3 className="w-5 h-5 text-yellow-500 mr-2" />
+              Edit Image
+            </h3>
+            <form onSubmit={handleEditImageSubmit} className="space-y-4">
+              {/* Design Selection */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Design</label>
+                <select
+                  value={editForm.design}
+                  onChange={e => setEditForm({ ...editForm, design: e.target.value })}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
                 >
-                  {sendingReply ? 'Sending...' : 'Send Reply'}
+                  {designs.map(design => (
+                    <option key={design.value} value={design.value}>{design.label}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Metal Selection */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Metal</label>
+                <select
+                  value={editForm.metal}
+                  onChange={e => setEditForm({ ...editForm, metal: e.target.value })}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                >
+                  {metals.map(metal => (
+                    <option key={metal.value} value={metal.value}>{metal.label}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Shape Selection */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Diamond Shape</label>
+                <select
+                  value={editForm.diamond_shape}
+                  onChange={e => setEditForm({ ...editForm, diamond_shape: e.target.value })}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                >
+                  {shapes.map(shape => (
+                    <option key={shape.value} value={shape.value}>{shape.label}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Carat Input */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Carat</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={editForm.carat}
+                  onChange={e => setEditForm({ ...editForm, carat: e.target.value })}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                />
+              </div>
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Replace Image (optional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEditFileSelect}
+                  className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                />
+              </div>
+              {/* Preview */}
+              <div>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Preview</label>
+                <div className="border border-brilliantBlue/30 rounded-md p-2">
+                  <img
+                    src={editPreviewUrl || editingImage.public_url}
+                    alt="Preview"
+                    className="max-w-full h-32 object-contain mx-auto"
+                  />
+                </div>
+              </div>
+              {/* Buttons */}
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 rounded bg-gray-200 text-champagneGold hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
+                >
+                  Save Changes
                 </button>
               </div>
-            )}
-            <div className="flex gap-2">
-              <button
-                onClick={() => { handleMessageStatusChange(viewedMessage.id, 'read'); setViewedMessage(null); }}
-                className="bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700"
-                disabled={viewedMessage.status === 'read' || viewedMessage.status === 'responded'}
-              >Mark as Read</button>
-              <button
-                onClick={() => { handleMessageStatusChange(viewedMessage.id, 'responded'); setViewedMessage(null); }}
-                className="bg-yellow-500 text-champagneGold px-4 py-2 rounded font-bold hover:bg-yellow-600"
-                disabled={viewedMessage.status === 'responded'}
-              >Mark as Responded</button>
-              <button
-                onClick={() => { handleDeleteMessage(viewedMessage.id); setViewedMessage(null); }}
-                className="bg-red-600 text-white px-4 py-2 rounded font-bold hover:bg-red-700"
-              >Delete</button>
-            </div>
+            </form>
           </div>
         </div>
+      )}
+
+      {/* Product Management Section */}
+      {activeTab === 'catalog' && (
+        <>
+          {/* Header Card */}
+          <div className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-brilliantBlue/10 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-brilliantBlue mb-1">Product Catalog Management</h1>
+              <p className="text-champagneGold">Add and manage general and special products for your store</p>
+            </div>
+            <button
+              onClick={() => setShowProductModal(true)}
+              className="px-6 py-2 bg-brilliantBlue text-white rounded-full font-bold hover:bg-champagneGold hover:text-brilliantBlue transition border border-brilliantBlue focus:outline-none focus:ring-2 focus:ring-brilliantBlue/40"
+            >
+              + Add New Product
+            </button>
+          </div>
+          {/* Product Management Card */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-brilliantBlue/10">
+            <div className="flex items-center mb-6">
+              <Gem className="w-6 h-6 mr-2 text-pink-500" />
+              <h2 className="text-xl font-semibold text-brilliantBlue">Manage Products</h2>
+            </div>
+            {loadingProducts ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brilliantBlue"></div>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Gem className="w-12 h-12 mb-2 text-yellow-400" />
+                <p className="text-lg text-yellow-500 font-semibold">No products found</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {products.map(product => (
+                  <div key={product.id} className="bg-brilliantBlue/5 rounded-lg border border-brilliantBlue/20 p-4 flex flex-col items-center shadow-sm">
+                    <img
+                      src={product.image_url || '/placeholder-ring.png'}
+                      alt={product.name}
+                      className="w-20 h-20 object-cover rounded border border-brilliantBlue/20 mb-3"
+                    />
+                    <div className="font-bold text-brilliantBlue text-lg text-center">
+                      {product.name} {product.is_special && <span className="ml-2 px-2 py-0.5 bg-pink-200 text-pink-700 rounded-full text-xs font-bold">Special</span>}
+                    </div>
+                    <div className="text-sm text-champagneGold text-center mb-1">${product.price} • {product.is_visible ? 'Visible' : 'Hidden'}</div>
+                    {product.description && <div className="text-xs text-gray-500 text-center mb-2">{product.description}</div>}
+                    {/* Future: Edit/Delete buttons here */}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {showProductModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+                <h3 className="text-lg font-semibold mb-2 text-brilliantBlue flex items-center">
+                  <Gem className="w-5 h-5 text-pink-500 mr-2" />
+                  Add New Product
+                </h3>
+                <form onSubmit={handleProductSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-champagneGold mb-2">Product Name *</label>
+                    <input
+                      type="text"
+                      value={productForm.name}
+                      onChange={e => setProductForm({ ...productForm, name: e.target.value })}
+                      className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-champagneGold mb-2">Description</label>
+                    <textarea
+                      value={productForm.description}
+                      onChange={e => setProductForm({ ...productForm, description: e.target.value })}
+                      className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-champagneGold mb-2">Price *</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={productForm.price}
+                      onChange={e => setProductForm({ ...productForm, price: e.target.value })}
+                      className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-champagneGold mb-2">Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files[0];
+                        setProductForm({ ...productForm, imageFile: file, imagePreview: file ? URL.createObjectURL(file) : '' });
+                      }}
+                      className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                    />
+                    {productForm.imagePreview && (
+                      <div className="mt-2 border border-brilliantBlue/30 rounded-md p-2">
+                        <img src={productForm.imagePreview} alt="Preview" className="max-w-full h-32 object-contain mx-auto" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={productForm.is_special}
+                        onChange={e => setProductForm({ ...productForm, is_special: e.target.checked })}
+                        className="mr-2"
+                      />
+                      Special Product
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={productForm.is_visible}
+                        onChange={e => setProductForm({ ...productForm, is_visible: e.target.checked })}
+                        className="mr-2"
+                      />
+                      Visible
+                    </label>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowProductModal(false)}
+                      className="px-4 py-2 rounded bg-gray-200 text-champagneGold hover:bg-gray-300"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={productUploading}
+                      className="px-4 py-2 rounded bg-brilliantBlue text-white hover:bg-champagneGold hover:text-brilliantBlue"
+                    >
+                      {productUploading ? 'Saving...' : 'Save Product'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -17,7 +17,7 @@ const Contact = () => {
     e.preventDefault();
     setSubmitting(true);
     setStatus('');
-    console.log('Submitting contact form:', form);
+
     try {
       const { data, error } = await supabase.from('messages').insert({
         name: form.name,
@@ -25,7 +25,7 @@ const Contact = () => {
         message: form.message,
         status: 'unread'
       });
-      console.log('Supabase insert result:', { data, error });
+
       if (error) throw error;
       setStatus(t('messageSent'));
       setForm({ name: '', email: '', message: '' });

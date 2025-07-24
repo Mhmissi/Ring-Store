@@ -67,7 +67,7 @@ const Shop = () => {
 
         if (discountsError) throw discountsError;
 
-        console.log('Fetched discounts:', discountsData); // Debug log
+
 
         setProducts(productsData || []);
         setPricingData(pricingData || []);
@@ -244,7 +244,7 @@ const Shop = () => {
           const discountedPrice = discount ? getDiscountedPrice(product) : price;
           
           // Debug logging
-          console.log('Product:', product.design, 'Price:', price, 'Discount:', discount, 'Discounted Price:', discountedPrice);
+  
           
           return (
         <div key={product.id} className="bg-softGray rounded-2xl shadow-elegant border border-navyBlue/20 hover:border-navyBlue transition-all duration-300 flex flex-col items-center group overflow-hidden relative">

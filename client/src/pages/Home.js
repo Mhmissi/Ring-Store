@@ -85,33 +85,9 @@ const Home = () => {
         setDiscounts(discountsData || []);
         
         // Debug logging
-        console.log('Fetched discounts:', discountsData);
-        console.log('Fetched products:', productsData?.length);
-        console.log('Fetched pricing:', pricingData?.length);
-        console.log('Current date:', new Date().toISOString().split('T')[0]);
+
         
-        // Log all products to see their structure
-        if (productsData && productsData.length > 0) {
-          console.log('All products:', productsData.map(p => ({
-            id: p.id,
-            design: p.design,
-            metal: p.metal,
-            shape: p.diamond_shape,
-            carat: p.carat
-          })));
-        }
-        
-        // Log all discounts to see their structure
-        if (discountsData && discountsData.length > 0) {
-          console.log('All discounts:', discountsData.map(d => ({
-            id: d.id,
-            design: d.design,
-            metal: d.metal,
-            shape: d.shape,
-            percentage: d.discount_percentage,
-            is_active: d.is_active
-          })));
-        }
+
       } catch (error) {
         console.error('Error fetching bestsellers:', error);
         setBestsellers([]);
@@ -142,7 +118,7 @@ const Home = () => {
     e.preventDefault();
     setSubmitting(true);
     setStatus('');
-    console.log('Submitting contact form:', form);
+
     try {
       const { data, error } = await supabase.from('messages').insert({
         name: form.name,
@@ -150,7 +126,7 @@ const Home = () => {
         message: form.message,
         status: 'unread'
       });
-      console.log('Supabase insert result:', { data, error });
+
       if (error) throw error;
       setStatus('Message sent! We will get back to you soon.');
       setForm({ name: '', email: '', message: '' });
@@ -194,7 +170,7 @@ const Home = () => {
 
   // Get discount for a product
   const getDiscountForProduct = (product) => {
-    console.log('Checking discounts for product:', product.design, 'Available discounts:', discounts.length);
+    
     
     const applicableDiscounts = discounts.filter(discount => {
       // Design matching - more flexible
@@ -255,35 +231,23 @@ const Home = () => {
         }
       }
       
-      // Debug logging for discount matching
-      console.log('Discount matching for product:', product.design, {
-        discountDesign: discount.design,
-        discountMetal: discount.metal,
-        discountShape: discount.shape,
-        productDesign: product.design,
-        productMetal: product.metal,
-        productShape: product.diamond_shape,
-        designMatch,
-        metalMatch,
-        shapeMatch,
-        isMatch: designMatch && metalMatch && shapeMatch
-      });
+
       
       return designMatch && metalMatch && shapeMatch;
     });
     
-    console.log('Applicable discounts for', product.design, ':', applicableDiscounts);
+
     
     // Return the highest discount percentage
     if (applicableDiscounts.length > 0) {
       const bestDiscount = applicableDiscounts.reduce((max, discount) => 
         discount.discount_percentage > max.discount_percentage ? discount : max
       );
-      console.log('Best discount for', product.design, ':', bestDiscount);
+
       return bestDiscount;
     }
     
-    console.log('No discount found for', product.design);
+
     return null;
   };
 
@@ -480,16 +444,7 @@ const Home = () => {
             const discount = getDiscountForProduct(product);
             const discountedPrice = discount ? getDiscountedPrice(product) : price;
             
-            // Debug logging
-            console.log('Product:', product.design, 'Price:', price, 'Discount:', discount, 'Discounted Price:', discountedPrice);
-            console.log('Product details:', {
-              design: product.design,
-              metal: product.metal,
-              shape: product.diamond_shape,
-              carat: product.carat,
-              hasDiscount: !!discount,
-              discountPercentage: discount?.discount_percentage
-            });
+            
             
             return (
               <a 
