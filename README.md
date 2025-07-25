@@ -186,21 +186,72 @@ client/
 
 ## Production Deployment
 
+### Pre-deployment Checklist
+- [ ] All environment variables are configured
+- [ ] Supabase database is properly set up
+- [ ] Storage bucket is configured and public
+- [ ] Admin emails are configured
+- [ ] SSL certificate is enabled (for HTTPS)
+
+### Environment Setup
+1. Copy `env.example` to `.env` in the client directory
+2. Fill in all required environment variables:
+   ```bash
+   REACT_APP_SUPABASE_URL=your_supabase_project_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   REACT_APP_ADMIN_EMAILS=admin@yourdomain.com,admin2@yourdomain.com
+   ```
+
 ### Build for Production
 ```bash
+cd client
+npm install
 npm run build
 ```
 
 ### Deploy Options
-- **Vercel**: Connect your GitHub repo and deploy automatically
-- **Netlify**: Drag and drop the `build` folder
-- **AWS S3**: Upload the `build` folder to an S3 bucket
-- **Any static hosting**: The build folder contains all necessary files
 
-### Environment Variables for Production
-Make sure to set the same environment variables in your production environment:
-- `REACT_APP_SUPABASE_URL`
-- `REACT_APP_SUPABASE_ANON_KEY`
+#### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+#### Netlify
+1. Drag and drop the `build` folder to Netlify
+2. Set environment variables in Netlify dashboard
+3. Configure custom domain if needed
+
+#### AWS S3 + CloudFront
+1. Upload `build` folder to S3 bucket
+2. Configure CloudFront distribution
+3. Set up custom domain with SSL
+
+#### Docker Deployment
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### Security Considerations
+- ✅ Environment variables are properly configured
+- ✅ Admin access is restricted to authorized emails
+- ✅ Input validation is implemented
+- ✅ Error boundaries are in place
+- ✅ HTTPS is enforced in production
+- ✅ CORS is properly configured in Supabase
+
+### Performance Optimization
+- ✅ Code splitting with lazy loading
+- ✅ Optimized images and assets
+- ✅ Minified production build
+- ✅ CDN for static assets
+- ✅ Proper caching headers
 
 ## Troubleshooting
 

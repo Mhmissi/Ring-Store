@@ -1,94 +1,28 @@
-import React, { useState, useEffect, useContext, createContext } from 'react';
+import React, { useState, useEffect, useContext, createContext, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RingCustomizer from './components/RingCustomizer';
 import AdminPanel from './components/AdminPanel';
 import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Wishlist from './pages/Wishlist';
-import Account from './pages/Account';
 import './index.css';
 import AdminLogin from './pages/AdminLogin';
 import ChangePassword from './components/ChangePassword';
 import AuthPage from './pages/AuthPage';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import ErrorBoundary from './components/ErrorBoundary';
+import LoadingSpinner from './components/LoadingSpinner';
 
 import { supabase } from './lib/supabase';
 
-// Remove unused imports
-// import { Link } from 'react-router-dom';
-// import Login from './pages/Login';
-// import SignUp from './pages/SignUp';
-// Remove unused variables
-// const featuredProducts = [
-//   {
-//     id: 1,
-//     name: 'Classic Solitaire',
-//     image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-//     price: 1200
-//   },
-//   {
-//     id: 2,
-//     name: 'Halo Setting',
-//     image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80',
-//     price: 1850
-//   },
-//   {
-//     id: 3,
-//     name: 'Three Stone',
-//     image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
-//     price: 2100
-//   }
-// ];
+// Lazy load components for better performance
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Account = lazy(() => import('./pages/Account'));
 
-// const TEAM = [
-//   {
-//     name: "Avi Shemesh",
-//     title: "Founder & Master Jeweler",
-//     funFact: "Handcrafts every prototype himself.",
-//     img: null, // Add image path if available
-//   },
-//   {
-//     name: "Leah Gold",
-//     title: "Customer Experience Lead",
-//     funFact: "Loves matching rings to stories.",
-//     img: null,
-//   },
-// ];
 
-// const VALUES = [
-//   {
-//     icon: (
-//       <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.343-3 3 0 2.5 3 5 3 5s3-2.5 3-5c0-1.657-1.343-3-3-3z" /><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /></svg>
-//     ),
-//     title: "Ethical Sourcing",
-//     desc: "Responsibly sourced materials for peace of mind."
-//   },
-//   {
-//     icon: (
-//       <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" /><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /></svg>
-//     ),
-//     title: "Craftsmanship",
-//     desc: "Every ring is meticulously handcrafted."
-//   },
-//   {
-//     icon: (
-//       <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12l2 2 4-4" /><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /></svg>
-//     ),
-//     title: "Personal Service",
-//     desc: "Guidance at every step of your journey."
-//   },
-//   {
-//     icon: (
-//       <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" /></svg>
-//     ),
-//     title: "Celebrating Love",
-//     desc: "Jewelry for life's most meaningful moments."
-//   },
-// ];
 
 const CartCount = () => {
   const { cart } = useCart();
@@ -460,7 +394,9 @@ const Footer = () => {
   );
 };
 
-const ADMIN_EMAILS = ['user123@gmail.com'];
+const ADMIN_EMAILS = process.env.REACT_APP_ADMIN_EMAILS ? 
+  process.env.REACT_APP_ADMIN_EMAILS.split(',') : 
+  ['user123@gmail.com'];
 
 function AdminRoute() {
   const [user, setUser] = React.useState(null);
@@ -485,29 +421,33 @@ function AdminRoute() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <CartProvider>
-        <Router>
-          <Header />
-          <main className="min-h-screen bg-white font-sans">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/customize" element={<RingCustomizer />} />
+    <ErrorBoundary>
+      <LanguageProvider>
+        <CartProvider>
+          <Router>
+            <Header />
+            <main className="min-h-screen bg-white font-sans">
+              <Suspense fallback={<LoadingSpinner />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/account" element={<Account />} />
+                  <Route path="/customize" element={<RingCustomizer />} />
 
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/admin" element={<AdminRoute />} />
-            </Routes>
-          </main>
-          <Footer />
-        </Router>
-      </CartProvider>
-    </LanguageProvider>
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/admin" element={<AdminRoute />} />
+                </Routes>
+              </Suspense>
+            </main>
+            <Footer />
+          </Router>
+        </CartProvider>
+      </LanguageProvider>
+    </ErrorBoundary>
   );
 }
 

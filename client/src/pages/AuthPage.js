@@ -17,8 +17,43 @@ export default function AuthPage({ onAuth }) {
   const [resetMode, setResetMode] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
 
+  const validateForm = () => {
+    const errors = [];
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      errors.push('Please enter a valid email address');
+    }
+    
+    // Password validation
+    if (!password || password.length < 6) {
+      errors.push('Password must be at least 6 characters long');
+    }
+    
+    // Name validation for signup
+    if (mode === 'signup') {
+      if (!name || name.trim().length < 2) {
+        errors.push('Name must be at least 2 characters long');
+      }
+      if (!surname || surname.trim().length < 2) {
+        errors.push('Surname must be at least 2 characters long');
+      }
+    }
+    
+    return errors;
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
+    
+    // Validate form
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setError(validationErrors.join(', '));
+      return;
+    }
+    
     setLoading(true);
     setError('');
     let result;
@@ -29,9 +64,9 @@ export default function AuthPage({ onAuth }) {
       if (!result.error && result.data?.user) {
         await supabase.from('profiles').upsert({
           id: result.data.user.id,
-          name,
-          surname,
-          address,
+          name: name.trim(),
+          surname: surname.trim(),
+          address: address.trim(),
         });
       }
     }

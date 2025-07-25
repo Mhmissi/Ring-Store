@@ -669,7 +669,6 @@ const AdminPanel = () => {
 
   const handleEditImageSubmit = async (e) => {
     e.preventDefault();
-    console.log('Edit form data:', editForm); // Debug log
     
     // Validate required fields
     if (!editForm.design || !editForm.metal || !editForm.diamond_shape || !editForm.carat) {
@@ -684,21 +683,12 @@ const AdminPanel = () => {
     try {
       // If a new file is selected, upload it
       if (selectedFile) {
-        console.log('Uploading new file...'); // Debug log
-        console.log('File details:', {
-          name: selectedFile.name,
-          size: selectedFile.size,
-          type: selectedFile.type
-        }); // Debug log
-        
         // Build new path
         const newPath = `rings/${editForm.design}/${editForm.metal}/${editForm.diamond_shape}/${editForm.carat}ct.png`;
-        console.log('New path:', newPath); // Debug log
         
         try {
           // Remove old image from storage if path changes
           if (oldImageUrl && oldImageUrl !== newPath) {
-            console.log('Removing old image:', oldImageUrl); // Debug log
             const { error: removeError } = await supabase.storage.from('ring-images').remove([oldImageUrl]);
             if (removeError) {
               console.error('Error removing old image:', removeError);
@@ -707,26 +697,20 @@ const AdminPanel = () => {
           }
           
           // Upload new file
-          console.log('Starting file upload...'); // Debug log
-          const { data: uploadData, error: uploadError } = await supabase.storage.from('ring-images').upload(newPath, selectedFile, { 
+          const { error: uploadError } = await supabase.storage.from('ring-images').upload(newPath, selectedFile, { 
             cacheControl: '3600', 
             upsert: true 
           });
           
           if (uploadError) {
-            console.error('Upload error details:', uploadError); // Debug log
             throw new Error(`Upload failed: ${uploadError.message}`);
           }
-          
-          console.log('Upload successful:', uploadData); // Debug log
           
           // Get new public URL
           const { data: urlData } = supabase.storage.from('ring-images').getPublicUrl(newPath);
           newImageUrl = newPath;
           newPublicUrl = urlData.publicUrl;
-          console.log('New file uploaded successfully, URL:', newPublicUrl); // Debug log
         } catch (uploadErr) {
-          console.error('File upload failed:', uploadErr); // Debug log
           throw new Error(`File upload failed: ${uploadErr.message}`);
         }
       }
@@ -741,23 +725,15 @@ const AdminPanel = () => {
         public_url: newPublicUrl
       };
       
-      console.log('Updating database with:', updateData); // Debug log
-      console.log('Updating record with ID:', editForm.id); // Debug log
-      
-      const { data: updateResult, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('ring_images')
         .update(updateData)
         .eq('id', editForm.id)
         .select(); // Add select() to get the updated record
         
       if (updateError) {
-        console.error('Database update error details:', updateError); // Debug log
         throw new Error(`Database update failed: ${updateError.message}`);
       }
-      
-      console.log('Database update result:', updateResult); // Debug log
-      
-      console.log('Database updated successfully'); // Debug log
       setMessage('✅ Image updated successfully!');
       setShowEditModal(false);
       setEditingImage(null);
@@ -776,8 +752,7 @@ const AdminPanel = () => {
         
         if (shouldUpdateMetadata) {
           try {
-            console.log('Attempting to update metadata only...'); // Debug log
-            const { data: updateResult, error: updateError } = await supabase
+            const { error: updateError } = await supabase
               .from('ring_images')
               .update({
                 design: editForm.design,
@@ -789,8 +764,6 @@ const AdminPanel = () => {
               .select();
               
             if (updateError) throw updateError;
-            
-            console.log('Metadata update successful:', updateResult); // Debug log
             setMessage('✅ Product metadata updated successfully! (Image unchanged)');
             setShowEditModal(false);
             setEditingImage(null);
@@ -800,7 +773,6 @@ const AdminPanel = () => {
             fetchUploadedImages();
             return;
           } catch (metadataError) {
-            console.error('Metadata update failed:', metadataError);
             setMessage('❌ Error updating metadata: ' + metadataError.message);
             return;
           }

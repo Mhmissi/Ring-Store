@@ -1,13 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables check
+// Environment variables validation
+const requiredEnvVars = {
+  REACT_APP_SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL,
+  REACT_APP_SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY,
+};
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+// Check for missing environment variables
+const missingVars = Object.entries(requiredEnvVars)
+  .filter(([key, value]) => !value)
+  .map(([key]) => key);
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+if (missingVars.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${missingVars.join(', ')}. ` +
+    'Please check your .env file and ensure all required variables are set.'
+  );
 }
+
+const supabaseUrl = requiredEnvVars.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = requiredEnvVars.REACT_APP_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
