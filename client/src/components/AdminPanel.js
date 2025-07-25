@@ -58,7 +58,6 @@ const AdminPanel = () => {
   const [orderActionMessage, setOrderActionMessage] = useState("");
   const [deletingOrderId, setDeletingOrderId] = useState(null);
   const [messageActionMessage, setMessageActionMessage] = useState("");
-  const [viewedMessage, setViewedMessage] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
 
   // Updated options based on your specifications
@@ -1427,7 +1426,6 @@ const AdminPanel = () => {
                         <td className="py-2 px-3 text-brilliantBlue max-w-xs truncate" title={msg.message}>{msg.message}</td>
                         <td className="py-2 px-3 text-brilliantBlue">
                           <button
-                            onClick={() => setViewedMessage(msg)}
                             className="text-brilliantBlue underline text-sm mr-2"
                           >
                             View
