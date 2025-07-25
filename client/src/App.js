@@ -442,10 +442,10 @@ const Footer = () => {
       </div>
       <div>
         <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">{t('contact')}</h4>
-        <p className="text-darkGray">{t('diamondAvenue')}</p>
-        <p className="text-darkGray">{t('globalHeadquarters')}</p>
+        <p className="text-darkGray">Koningin Astridplein 31</p>
+        <p className="text-darkGray">2010 Antwerpen, Belgium</p>
         <p className="text-darkGray">info@grownlabdiamond.com</p>
-        <p className="text-darkGray">+972 3-123-4567</p>
+        <p className="text-darkGray">+32 490 25 90 05</p>
       </div>
       <div>
         <h4 className="font-serif text-lg font-bold mb-2 text-navyBlue">{t('newsletter')}</h4>

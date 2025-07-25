@@ -669,42 +669,95 @@ const AdminPanel = () => {
 
   const handleEditImageSubmit = async (e) => {
     e.preventDefault();
+    console.log('Edit form data:', editForm); // Debug log
+    
+    // Validate required fields
     if (!editForm.design || !editForm.metal || !editForm.diamond_shape || !editForm.carat) {
       setMessage('Please fill in all required fields for editing.');
       return;
     }
+    
     let newImageUrl = editForm.image_url;
     let newPublicUrl = editForm.public_url;
     let oldImageUrl = editForm.image_url;
+    
     try {
+      // If a new file is selected, upload it
       if (selectedFile) {
+        console.log('Uploading new file...'); // Debug log
+        console.log('File details:', {
+          name: selectedFile.name,
+          size: selectedFile.size,
+          type: selectedFile.type
+        }); // Debug log
+        
         // Build new path
         const newPath = `rings/${editForm.design}/${editForm.metal}/${editForm.diamond_shape}/${editForm.carat}ct.png`;
-        // Remove old image from storage if path changes
-        if (oldImageUrl && oldImageUrl !== newPath) {
-          await supabase.storage.from('ring-images').remove([oldImageUrl]);
+        console.log('New path:', newPath); // Debug log
+        
+        try {
+          // Remove old image from storage if path changes
+          if (oldImageUrl && oldImageUrl !== newPath) {
+            console.log('Removing old image:', oldImageUrl); // Debug log
+            const { error: removeError } = await supabase.storage.from('ring-images').remove([oldImageUrl]);
+            if (removeError) {
+              console.error('Error removing old image:', removeError);
+              // Don't throw here, continue with upload
+            }
+          }
+          
+          // Upload new file
+          console.log('Starting file upload...'); // Debug log
+          const { data: uploadData, error: uploadError } = await supabase.storage.from('ring-images').upload(newPath, selectedFile, { 
+            cacheControl: '3600', 
+            upsert: true 
+          });
+          
+          if (uploadError) {
+            console.error('Upload error details:', uploadError); // Debug log
+            throw new Error(`Upload failed: ${uploadError.message}`);
+          }
+          
+          console.log('Upload successful:', uploadData); // Debug log
+          
+          // Get new public URL
+          const { data: urlData } = supabase.storage.from('ring-images').getPublicUrl(newPath);
+          newImageUrl = newPath;
+          newPublicUrl = urlData.publicUrl;
+          console.log('New file uploaded successfully, URL:', newPublicUrl); // Debug log
+        } catch (uploadErr) {
+          console.error('File upload failed:', uploadErr); // Debug log
+          throw new Error(`File upload failed: ${uploadErr.message}`);
         }
-        // Upload new file
-        const { error: uploadError } = await supabase.storage.from('ring-images').upload(newPath, selectedFile, { cacheControl: '3600', upsert: true });
-        if (uploadError) throw uploadError;
-        // Get new public URL
-        const { data: urlData } = supabase.storage.from('ring-images').getPublicUrl(newPath);
-        newImageUrl = newPath;
-        newPublicUrl = urlData.publicUrl;
       }
-      // Update DB
-      const { error: updateError } = await supabase
+      
+      // Update database
+      const updateData = {
+        design: editForm.design,
+        metal: editForm.metal,
+        diamond_shape: editForm.diamond_shape,
+        carat: parseFloat(editForm.carat),
+        image_url: newImageUrl,
+        public_url: newPublicUrl
+      };
+      
+      console.log('Updating database with:', updateData); // Debug log
+      console.log('Updating record with ID:', editForm.id); // Debug log
+      
+      const { data: updateResult, error: updateError } = await supabase
         .from('ring_images')
-        .update({
-          design: editForm.design,
-          metal: editForm.metal,
-          diamond_shape: editForm.diamond_shape,
-          carat: parseFloat(editForm.carat),
-          image_url: newImageUrl,
-          public_url: newPublicUrl
-        })
-        .eq('id', editForm.id);
-      if (updateError) throw updateError;
+        .update(updateData)
+        .eq('id', editForm.id)
+        .select(); // Add select() to get the updated record
+        
+      if (updateError) {
+        console.error('Database update error details:', updateError); // Debug log
+        throw new Error(`Database update failed: ${updateError.message}`);
+      }
+      
+      console.log('Database update result:', updateResult); // Debug log
+      
+      console.log('Database updated successfully'); // Debug log
       setMessage('✅ Image updated successfully!');
       setShowEditModal(false);
       setEditingImage(null);
@@ -714,6 +767,46 @@ const AdminPanel = () => {
       fetchUploadedImages();
     } catch (error) {
       console.error('Error updating image:', error);
+      
+      // If file upload failed but we have changes to metadata, offer to update just the metadata
+      if (error.message.includes('File upload failed') && (!selectedFile || selectedFile === null)) {
+        const shouldUpdateMetadata = window.confirm(
+          'File upload failed, but would you like to update the product metadata (design, metal, shape, carat) without changing the image?'
+        );
+        
+        if (shouldUpdateMetadata) {
+          try {
+            console.log('Attempting to update metadata only...'); // Debug log
+            const { data: updateResult, error: updateError } = await supabase
+              .from('ring_images')
+              .update({
+                design: editForm.design,
+                metal: editForm.metal,
+                diamond_shape: editForm.diamond_shape,
+                carat: parseFloat(editForm.carat)
+              })
+              .eq('id', editForm.id)
+              .select();
+              
+            if (updateError) throw updateError;
+            
+            console.log('Metadata update successful:', updateResult); // Debug log
+            setMessage('✅ Product metadata updated successfully! (Image unchanged)');
+            setShowEditModal(false);
+            setEditingImage(null);
+            setEditForm({ design: '', metal: '', diamond_shape: '', carat: '', image_url: '', public_url: '', id: null });
+            setEditPreviewUrl('');
+            setSelectedFile(null);
+            fetchUploadedImages();
+            return;
+          } catch (metadataError) {
+            console.error('Metadata update failed:', metadataError);
+            setMessage('❌ Error updating metadata: ' + metadataError.message);
+            return;
+          }
+        }
+      }
+      
       setMessage('❌ Error updating image: ' + error.message);
     }
   };
@@ -1742,12 +1835,14 @@ const AdminPanel = () => {
             <form onSubmit={handleEditImageSubmit} className="space-y-4">
               {/* Design Selection */}
               <div>
-                <label className="block text-sm font-medium text-champagneGold mb-2">Design</label>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Design *</label>
                 <select
                   value={editForm.design}
                   onChange={e => setEditForm({ ...editForm, design: e.target.value })}
                   className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                  required
                 >
+                  <option value="">Select Design</option>
                   {designs.map(design => (
                     <option key={design.value} value={design.value}>{design.label}</option>
                   ))}
@@ -1755,12 +1850,14 @@ const AdminPanel = () => {
               </div>
               {/* Metal Selection */}
               <div>
-                <label className="block text-sm font-medium text-champagneGold mb-2">Metal</label>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Metal *</label>
                 <select
                   value={editForm.metal}
                   onChange={e => setEditForm({ ...editForm, metal: e.target.value })}
                   className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                  required
                 >
+                  <option value="">Select Metal</option>
                   {metals.map(metal => (
                     <option key={metal.value} value={metal.value}>{metal.label}</option>
                   ))}
@@ -1768,12 +1865,14 @@ const AdminPanel = () => {
               </div>
               {/* Shape Selection */}
               <div>
-                <label className="block text-sm font-medium text-champagneGold mb-2">Diamond Shape</label>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Diamond Shape *</label>
                 <select
                   value={editForm.diamond_shape}
                   onChange={e => setEditForm({ ...editForm, diamond_shape: e.target.value })}
                   className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                  required
                 >
+                  <option value="">Select Shape</option>
                   {shapes.map(shape => (
                     <option key={shape.value} value={shape.value}>{shape.label}</option>
                   ))}
@@ -1781,13 +1880,15 @@ const AdminPanel = () => {
               </div>
               {/* Carat Input */}
               <div>
-                <label className="block text-sm font-medium text-champagneGold mb-2">Carat</label>
+                <label className="block text-sm font-medium text-champagneGold mb-2">Carat *</label>
                 <input
                   type="number"
                   step="0.1"
                   value={editForm.carat}
                   onChange={e => setEditForm({ ...editForm, carat: e.target.value })}
                   className="w-full px-3 py-2 border border-brilliantBlue/30 rounded-md focus:outline-none focus:ring-2 focus:ring-brilliantBlue"
+                  required
+                  min="0.1"
                 />
               </div>
               {/* File Upload */}

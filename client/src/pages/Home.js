@@ -620,11 +620,12 @@ const Home = () => {
         <h2 className="text-3xl font-serif font-bold text-navyBlue mb-10 text-center" style={{ fontFamily: 'Playfair Display, serif' }}>
           Get In Touch
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div className="bg-softGray rounded-xl shadow-elegant p-8 border border-navyBlue/20">
-            <h3 className="text-xl font-bold text-navyBlue mb-6">Send us a Message</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column - Contact Form */}
+          <div className="bg-softGray rounded-xl shadow-elegant p-6 border border-navyBlue/20">
+            <h3 className="text-lg font-bold text-navyBlue mb-4">Send us a Message</h3>
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-navyBlue mb-1">Name</label>
                 <input 
@@ -632,7 +633,7 @@ const Home = () => {
                   name="name" 
                   value={form.name} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-3 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
+                  className="w-full px-3 py-2 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
                   placeholder="Your Name" 
                   required 
                 />
@@ -644,7 +645,7 @@ const Home = () => {
                   name="email" 
                   value={form.email} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-3 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
+                  className="w-full px-3 py-2 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
                   placeholder="you@email.com" 
                   required 
                 />
@@ -655,8 +656,8 @@ const Home = () => {
                   name="message" 
                   value={form.message} 
                   onChange={handleChange} 
-                  className="w-full px-4 py-3 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
-                  rows={4} 
+                  className="w-full px-3 py-2 border border-navyBlue/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-navyBlue/40 bg-pureWhite text-darkGray" 
+                  rows={3} 
                   placeholder="How can we help you with your lab-grown diamond needs?" 
                   required 
                 />
@@ -664,12 +665,12 @@ const Home = () => {
               <button 
                 type="submit" 
                 disabled={submitting} 
-                className="w-full bg-navyBlue hover:bg-warmGold hover:text-navyBlue text-white font-bold px-6 py-3 rounded-lg shadow-elegant transition-all duration-200 border border-warmGold disabled:opacity-50"
+                className="w-full bg-navyBlue hover:bg-warmGold hover:text-navyBlue text-white font-bold px-4 py-2 rounded-lg shadow-elegant transition-all duration-200 border border-warmGold disabled:opacity-50"
               >
                 {submitting ? 'Sending...' : 'Send Message'}
               </button>
               {status && (
-                <div className={`text-center mt-2 p-3 rounded-lg ${
+                <div className={`text-center mt-2 p-2 rounded-lg text-sm ${
                   status.startsWith('Error') 
                     ? 'bg-red-50 text-red-700 border border-red-200' 
                     : 'bg-green-50 text-green-700 border border-green-200'
@@ -680,42 +681,65 @@ const Home = () => {
             </form>
           </div>
           
-          {/* Contact Information */}
-          <div className="bg-pureWhite rounded-xl shadow-elegant p-8 border border-navyBlue/20">
-            <h3 className="text-xl font-bold text-navyBlue mb-6">Contact Information</h3>
-            <div className="space-y-6">
-              <div>
-                <h4 className="font-semibold text-navyBlue mb-2">Grown Lab Diamond</h4>
-                <p className="text-darkGray">Leading provider of ethically grown diamonds and sustainable luxury jewelry.</p>
+          {/* Right Column - Contact Information and Map in same container */}
+          <div className="bg-pureWhite rounded-xl shadow-elegant p-6 border border-navyBlue/20">
+            {/* Contact Information Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-navyBlue mb-4">Contact Information</h3>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-navyBlue mb-1 text-sm">Grown Lab Diamond</h4>
+                  <p className="text-darkGray text-sm">Leading provider of ethically grown diamonds and sustainable luxury jewelry.</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-navyBlue mb-1 text-sm">Address</h4>
+                  <p className="text-darkGray text-sm">Koningin Astridplein 31<br />2010 Antwerpen, Belgium</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-navyBlue mb-1 text-sm">Phone</h4>
+                  <p className="text-darkGray text-sm">+32 490 25 90 05</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-navyBlue mb-1 text-sm">Email</h4>
+                  <p className="text-darkGray text-sm">
+                    <a href="mailto:info@grownlabdiamond.com" className="text-navyBlue hover:text-warmGold transition">
+                      info@grownlabdiamond.com
+                    </a>
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-navyBlue mb-1 text-sm">Business Hours</h4>
+                  <div className="text-darkGray space-y-0.5 text-sm">
+                    <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                    <p>Saturday: 10:00 AM - 4:00 PM</p>
+                    <p>Sunday: By appointment only</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-navyBlue mb-2">Address</h4>
-                <p className="text-darkGray">123 Diamond Avenue<br />Global Headquarters</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-navyBlue mb-2">Phone</h4>
-                <p className="text-darkGray">+972 3-123-4567</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-navyBlue mb-2">Email</h4>
-                <p className="text-darkGray">
-                  <a href="mailto:info@grownlabdiamond.com" className="text-navyBlue hover:text-warmGold transition">
-                    info@grownlabdiamond.com
-                  </a>
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-navyBlue mb-2">Business Hours</h4>
-                <p className="text-darkGray">
-                  Monday - Friday: 9:00 AM - 6:00 PM<br />
-                  Saturday: 10:00 AM - 4:00 PM<br />
-                  Sunday: Closed
-                </p>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-navyBlue/20 mb-6"></div>
+
+            {/* Map Section */}
+            <div>
+              <h3 className="text-lg font-bold text-navyBlue mb-4">Find Us</h3>
+              <div className="w-full h-48 rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2519.1234567890123!2d4.421234567890123!3d51.21987654321098!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3f6b8b8b8b8b8%3A0x1234567890abcdef!2sKoningin%20Astridplein%2031%2C%202010%20Antwerpen%2C%20Belgium!5e0!3m2!1sen!2sbe!4v1640995200000!5m2!1sen!2sbe"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Grown Lab Diamond Location - Koningin Astridplein 31"
+                ></iframe>
               </div>
             </div>
           </div>
-      </div>
-    </section>
+        </div>
+      </section>
   </div>
 );
 };
