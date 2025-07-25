@@ -60,7 +60,6 @@ const AdminPanel = () => {
   const [messageActionMessage, setMessageActionMessage] = useState("");
   const [viewedMessage, setViewedMessage] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
-  const [replyText, setReplyText] = useState("");
 
   // Updated options based on your specifications
   const designs = [

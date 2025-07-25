@@ -120,7 +120,7 @@ const Home = () => {
     setStatus('');
 
     try {
-      const { data, error } = await supabase.from('messages').insert({
+      const { error } = await supabase.from('messages').insert({
         name: form.name,
         email: form.email,
         message: form.message,
