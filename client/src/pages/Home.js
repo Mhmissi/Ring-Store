@@ -711,8 +711,8 @@ const Home = () => {
                   <h4 className="font-semibold text-navyBlue mb-1 text-sm">Business Hours</h4>
                   <div className="text-darkGray space-y-0.5 text-sm">
                     <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                    <p>Saturday: 10:00 AM - 4:00 PM</p>
-                    <p>Sunday: By appointment only</p>
+                    <p>Saturday: Closed</p>
+                    <p>Sunday: 10:00 AM - 4:00 PM</p>
                   </div>
                 </div>
               </div>
