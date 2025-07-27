@@ -712,7 +712,7 @@ const Home = () => {
                   <div className="text-darkGray space-y-0.5 text-sm">
                     <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
                     <p>Saturday: Closed</p>
-                    <p>Sunday: 10:00 AM - 4:00 PM</p>
+                    <p>Sunday: 9:00 AM - 6:00 PM</p>
                   </div>
                 </div>
               </div>
